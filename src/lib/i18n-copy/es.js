@@ -92,6 +92,32 @@ export const copy = {
     unassigned: 'Sin asignar',
     emptyBlock: 'Todavía no hay tareas aquí.',
     emptyCaptures: 'Todavía no hay capturas.',
+
+    // Stitch "Vista Día" copy — calm, neutral, non-punitive.
+    pageTitle: 'Soporte del Día',
+    paceOpen: 'Ritmo abierto',
+    calmBanner:
+      'Cada momento cuenta. Si una tarea queda pendiente, simplemente se retoma cuando sea oportuno.',
+    anchorsPageTitle: 'Anclas del Día',
+    anchorsSubtitle: 'Puntos de apoyo sin penalización',
+    statusDone: 'Completado a tu ritmo',
+    statusActive: 'En marcha',
+    statusResume: 'Retomar en la próxima ancla (sin culpa)',
+    statusScheduled: 'Programado',
+    blocksPageTitle: 'Bloques de Tiempo',
+    blocksSubtitle: 'Contexto amplio · Sin micro-presión',
+    blockEnds: { manana: '13:00', mediodia: '18:00', tarde: '20:00' },
+    blockRest: 'Descanso',
+    taskOne: 'tarea',
+    taskMany: 'tareas',
+    emptyBlockGentle:
+      'Sin tareas asignadas aún. El descanso también es parte del andamio.',
+    startFocus: 'Iniciar enfoque',
+    apagadoTitle: 'Ritual de Apagado',
+    apagadoSubtitle:
+      'Descompresión para cerrar la jornada con tranquilidad y mente despejada.',
+    apagadoProgressOf: 'de',
+    apagadoProgressDone: 'completado',
   },
 
   focus: {
