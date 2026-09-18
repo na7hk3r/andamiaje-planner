@@ -25,7 +25,7 @@ if (typeof localStorage === 'undefined') {
 // The store is imported only after the stub above is installed (top-level
 // await keeps the ordering explicit). Subsequent fresh imports use
 // vi.resetModules() and re-read the stub, simulating an app reload.
-const { appState, focus, actions } = await import('../app-state.svelte.js');
+const { appState, focus, actions, resolveDefaultPreset } = await import('../app-state.svelte.js');
 
 const APPSTATE_KEYS = ['version', 'settings', 'day', 'week', 'view', 'disclaimerAccepted'];
 const SETTINGS_KEYS = ['wakeTime', 'anchorTimes', 'blockTimes', 'blockOrder', 'defaultTimerMin'];
@@ -326,6 +326,27 @@ describe('actions — settings sync to the day view', () => {
     expect(appState.settings.wakeTime).toBe('06:30');
     expect(actions.setWakeTime('no')).toBe(false);
     actions.setWakeTime('07:00');
+  });
+});
+
+describe('settings — default timer preset surfaced in focus (C1)', () => {
+  it('resolves the active preset from defaultTimerMin, exact and normalized', () => {
+    expect(resolveDefaultPreset(20)).toBe(20);
+    expect(resolveDefaultPreset(30)).toBe(30);
+    expect(resolveDefaultPreset(45)).toBe(45);
+    expect(resolveDefaultPreset(50)).toBe(45); // nearest preset
+    expect(resolveDefaultPreset(40)).toBe(45); // nearest preset (upper)
+    expect(resolveDefaultPreset(25)).toBe(20); // tie resolves to shorter
+    expect(resolveDefaultPreset(1)).toBe(20); // below the presets
+    expect(resolveDefaultPreset(120)).toBe(45); // above the presets
+  });
+
+  it('starts with the configured default minutes when no preset is chosen', () => {
+    actions.updateSettings({ defaultTimerMin: 45 });
+    expect(actions.startTimer()).toBe(45 * 60_000); // no-arg fallback
+    expect(focus.timerDurationMs).toBe(45 * 60_000);
+    actions.timerReset();
+    actions.updateSettings({ defaultTimerMin: 25 });
   });
 });
 

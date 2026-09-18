@@ -34,6 +34,25 @@ export const VIEWS = Object.freeze(['day', 'focus', 'week', 'settings']);
 export const RITUAL_STEPS_MAX = 4;
 export const PRIORITIES_MAX = 3;
 
+// Settings s2: the Countdown UI reflects settings.defaultTimerMin in its
+// preset row. Returns the preset that matches the configured default, or the
+// nearest preset when the default falls outside the fixed list — new presets
+// are never invented. Ties resolve to the shorter preset (deterministic).
+export function resolveDefaultPreset(minutes) {
+  const target = Number(minutes);
+  if (TIMER_PRESETS_MIN.includes(target)) return target;
+  let best = TIMER_PRESETS_MIN[0];
+  let bestDistance = Infinity;
+  for (const preset of TIMER_PRESETS_MIN) {
+    const distance = Math.abs(preset - target);
+    if (distance < bestDistance) {
+      best = preset;
+      bestDistance = distance;
+    }
+  }
+  return best;
+}
+
 const ANCHOR_IDS = ['despertar', 'primera_tarea', 'movimiento', 'apagado'];
 const BLOCK_IDS = ['manana', 'mediodia', 'tarde'];
 

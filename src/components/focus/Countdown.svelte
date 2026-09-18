@@ -6,7 +6,7 @@
   // marks the task done and sets the reward reference; the parent then
   // swaps to the reward step. The visible-tab limitation is documented
   // in-app with i18n copy while the countdown runs.
-  import { focus, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, focus, actions, resolveDefaultPreset } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import { formatDuration, TIMER_STATES } from '../../lib/logic/timer.js';
 
@@ -14,6 +14,11 @@
 
   const running = $derived(focus.timerState === TIMER_STATES.RUNNING);
   const display = $derived(formatDuration(focus.timerRemainingMs));
+
+  // Settings s2: the preset matching settings.defaultTimerMin is preselected
+  // (highlighted); when the default falls outside the fixed presets the
+  // nearest one reflects it. The setting itself is edited in SettingsView.
+  const defaultPreset = $derived(resolveDefaultPreset(appState.settings.defaultTimerMin));
 
   $effect(() => {
     if (!running) return;
@@ -29,6 +34,13 @@
   });
 
   function startPreset(min) {
+    // Accepting the preselected default starts through the store's no-arg
+    // fallback, so the run always honors appState.settings.defaultTimerMin
+    // (the preset chip is only the visible reflection of that setting).
+    if (min === defaultPreset) {
+      actions.startTimer();
+      return;
+    }
     actions.startTimer(min * 60_000);
   }
 
@@ -54,7 +66,13 @@
 
     <div class="presets">
       {#each actions.timerPresets() as min (min)}
-        <button class="preset" type="button" onclick={() => startPreset(min)}>
+        <button
+          class="preset"
+          class:default={min === defaultPreset}
+          type="button"
+          aria-pressed={min === defaultPreset}
+          onclick={() => startPreset(min)}
+        >
           {copy.focus.timerPresets[String(min)]}
         </button>
       {/each}
@@ -146,6 +164,13 @@
   .preset {
     flex: 1;
     min-width: 5.5rem;
+  }
+
+  .preset.default {
+    border-color: var(--accent, #4f6b8a);
+    background: var(--accent-soft, #eef2f7);
+    font-weight: 600;
+    color: var(--accent, #4f6b8a);
   }
 
   .custom {
