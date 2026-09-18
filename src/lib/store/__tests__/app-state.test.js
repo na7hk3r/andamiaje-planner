@@ -506,6 +506,71 @@ describe('actions — export / import roundtrip', () => {
   });
 });
 
+describe('actions — removeTask / clearLocalData', () => {
+  it('removes a block task and reports false for unknown ids', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'manana');
+    expect(actions.addTask('manana', 'Tarea a quitar')).toBe(true);
+    const taskId = block.tasks.at(-1).id;
+    expect(actions.removeTask(taskId)).toBe(true);
+    expect(block.tasks.some((t) => t.id === taskId)).toBe(false);
+    expect(actions.removeTask('does-not-exist')).toBe(false);
+  });
+
+  it('removes an unassigned capture', () => {
+    actions.capture('Borrar después');
+    const capturedId = appState.day.captured.at(-1).id;
+    expect(actions.removeTask(capturedId)).toBe(true);
+    expect(appState.day.captured.some((t) => t.id === capturedId)).toBe(false);
+  });
+
+  it('removes a promoted priority along with its schedule entries', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'mediodia');
+    if (block.tasks.length === 0) actions.addTask('mediodia', 'Tarea con prioridad');
+    const task = block.tasks[0];
+    actions.setTaskDone(task.id, false);
+    expect(actions.addPriorityTask(task.id)).toBe(true);
+    expect(actions.schedulePriority(task.id, '2026-09-20', 'mediodia')).toBe(true);
+    expect(actions.removeTask(task.id)).toBe(true);
+    expect(appState.week.priorities.some((p) => p.id === task.id)).toBe(false);
+    expect(appState.week.schedule.some((s) => s.priorityId === task.id)).toBe(false);
+  });
+
+  it('clears the focus candidate when the removed task is the one in focus', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'tarde');
+    if (block.tasks.length === 0) actions.addTask('tarde', 'Tarea enfocada');
+    const task = block.tasks[0];
+    expect(actions.startFocus(task.id)).toBe(true);
+    expect(focus.currentTask.taskId).toBe(task.id);
+    expect(actions.removeTask(task.id)).toBe(true);
+    expect(focus.currentTask).toBeNull();
+    expect(focus.timerState).toBe('idle');
+    expect(focus.reward).toBeNull();
+  });
+
+  it('wipes persisted data back to clean defaults and survives a reload', async () => {
+    await settle();
+    const seeded = await reloadStore();
+    seeded.actions.addTask('manana', 'Tarea a borrar');
+    seeded.actions.setAnchorChecked('despertar', true);
+    seeded.actions.updateSettings({ defaultTimerMin: 45 });
+    seeded.actions.setReviewAnswers(['Una respuesta']);
+    seeded.actions.acknowledgeDisclaimer();
+    await settle(); // debounced writes land
+
+    const cleared = await reloadStore();
+    expect(cleared.actions.clearLocalData()).toBe(true);
+    await settle(); // immediate write lands
+
+    const fresh = await reloadStore();
+    expect(fresh.appState.day.blocks.every((b) => b.tasks.length === 0)).toBe(true);
+    expect(fresh.appState.day.anchors.every((a) => a.checked === false)).toBe(true);
+    expect(fresh.appState.week.reviewAnswers).toEqual(['', '']);
+    expect(fresh.appState.settings.defaultTimerMin).toBe(30); // fresh defaults
+    expect(fresh.appState.disclaimerAccepted).toBe(false);
+    assertFullShape(fresh.appState);
+  });
+});
+
 describe('D6 — dateKey is display-only, nothing auto-resets', () => {
   it('restores a stored date and anchor state on reload instead of resetting', async () => {
     await settle();

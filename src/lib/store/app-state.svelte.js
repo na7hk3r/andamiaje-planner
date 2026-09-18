@@ -323,6 +323,42 @@ export const actions = {
     return true;
   },
 
+  // Deletes a task wherever it lives: day blocks, unassigned captures, or
+  // week priorities. A promoted priority shares the task id, so it is
+  // removed together with any schedule entry referencing it — the
+  // persisted shape never keeps dangling references. If the removed task
+  // is the active focus candidate, the transient session is cancelled.
+  removeTask(taskId) {
+    let removed = false;
+    for (const block of appState.day.blocks) {
+      const before = block.tasks.length;
+      block.tasks = block.tasks.filter((t) => t.id !== taskId);
+      if (block.tasks.length !== before) removed = true;
+    }
+    const capturedBefore = appState.day.captured.length;
+    appState.day.captured = appState.day.captured.filter((t) => t.id !== taskId);
+    if (appState.day.captured.length !== capturedBefore) removed = true;
+
+    const prioritiesBefore = appState.week.priorities.length;
+    appState.week.priorities = appState.week.priorities.filter((p) => p.id !== taskId);
+    if (appState.week.priorities.length !== prioritiesBefore) {
+      removed = true;
+      appState.week.schedule = appState.week.schedule.filter((s) => s.priorityId !== taskId);
+    }
+
+    if (!removed) return false;
+    if (focus.currentTask?.taskId === taskId) {
+      timer.reset();
+      focus.timerState = TIMER_STATES.IDLE;
+      focus.timerDurationMs = 0;
+      focus.timerRemainingMs = 0;
+      focus.reward = null;
+      focus.currentTask = null;
+    }
+    saveState(appState);
+    return true;
+  },
+
   // Swap keeps tasks attached: block objects move with their tasks.
   swapBlocks(aId, bId) {
     const blocks = appState.day.blocks;
@@ -529,6 +565,30 @@ export const actions = {
     const parsed = importState(json);
     if (!parsed) return false;
     applyParsed(parsed);
+    saveStateImmediate(appState);
+    return true;
+  },
+
+  // Full local-data wipe (Stitch "Limpiar datos locales"). The app returns
+  // to the exact clean-start defaults of a fresh install — day, week and
+  // settings included, disclaimer included — and the persisted envelope is
+  // written immediately so a reload cannot race the debounced writer. The
+  // transient focus session is cancelled too. The envelope keeps the same
+  // STATE_VERSION: this clears data, it never changes the shape.
+  clearLocalData() {
+    const fresh = defaultState();
+    appState.version = fresh.version;
+    appState.settings = fresh.settings;
+    appState.day = fresh.day;
+    appState.week = fresh.week;
+    appState.view = fresh.view;
+    appState.disclaimerAccepted = fresh.disclaimerAccepted;
+    timer.reset();
+    focus.timerState = TIMER_STATES.IDLE;
+    focus.timerDurationMs = 0;
+    focus.timerRemainingMs = 0;
+    focus.reward = null;
+    focus.currentTask = null;
     saveStateImmediate(appState);
     return true;
   },
