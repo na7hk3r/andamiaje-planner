@@ -9,7 +9,7 @@
 
 import { describe, it, expect, afterEach, afterAll, vi } from 'vitest';
 import { copy } from '../../i18n-copy/es.js';
-import { STORAGE_KEY } from '../../storage.js';
+import { STORAGE_KEY, STATE_VERSION } from '../../storage.js';
 
 // In-memory localStorage substitute (worker-local, never touches disk).
 const mem = new Map();
@@ -436,6 +436,47 @@ describe('D6 — dateKey is display-only, nothing auto-resets', () => {
     expect(fresh.appState.day.anchors.every((a) => a.checked === false)).toBe(false);
     expect(fresh.appState.view).toBe('week');
     expect(fresh.appState.disclaimerAccepted).toBe(true);
+    assertFullShape(fresh.appState);
+  });
+});
+
+describe('persistence — reload edge cases (verify S1/S2)', () => {
+  it('starts clean instead of crashing when the stored version is newer', async () => {
+    // Unsupported-version gate (storage.js loadState): a payload carrying a
+    // newer version than STATE_VERSION is indistinguishable from "app was
+    // written by a future build" -> clean start, never a crash.
+    await settle();
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ version: STATE_VERSION + 1, settings: { defaultTimerMin: 55 } }),
+    );
+    const fresh = await reloadStore();
+    expect(fresh.appState.version).toBe(STATE_VERSION);
+    expect(fresh.appState.settings.defaultTimerMin).toBe(25); // clean defaults
+    assertFullShape(fresh.appState);
+  });
+
+  it('restores a mid-ritual week intact through the persist/load path', async () => {
+    // Seed the week state through store actions (persist side), then reload:
+    // ritualStep/answers/priorities/schedule must come back field-for-field.
+    await settle();
+    const seeded = await reloadStore();
+    seeded.actions.setRitualStep(2);
+    seeded.actions.setReviewAnswers(['La rutina de la mañana', 'Más movimiento']);
+    seeded.actions.addPriority('Preparar la charla');
+    const priorityId = seeded.appState.week.priorities.at(-1).id;
+    seeded.actions.schedulePriority(priorityId, '2026-09-19', 'manana');
+    await settle(); // debounced write lands
+
+    const fresh = await reloadStore();
+    expect(fresh.appState.week.ritualStep).toBe(2);
+    expect(fresh.appState.week.reviewAnswers).toEqual(['La rutina de la mañana', 'Más movimiento']);
+    expect(fresh.appState.week.priorities).toEqual([
+      { id: priorityId, title: 'Preparar la charla', done: false },
+    ]);
+    expect(fresh.appState.week.schedule).toEqual([
+      { priorityId, day: '2026-09-19', blockId: 'manana' },
+    ]);
     assertFullShape(fresh.appState);
   });
 });
