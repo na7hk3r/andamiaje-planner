@@ -80,6 +80,7 @@ export const copy = {
     swapKeepsTasks: 'Las tareas se mantienen en su bloque.',
     tasksPlaceholder: 'Nueva tarea…',
     taskDoneLabel: 'Tarea terminada',
+    deleteTaskAria: 'Quitar tarea {task}',
     apagadoChecklistTitle: 'Antes de cerrar el día',
     apagadoChecklist: [
       'Teléfono fuera',
@@ -286,6 +287,54 @@ export const copy = {
     exportHint: 'Guarda una copia de tu plan en un archivo JSON.',
     importHint: 'Reemplaza el plan actual con el archivo importado.',
     importError: 'El archivo no es un plan válido.',
+
+    // Stitch "Ajustes" — calm settings screen copy (spec mock).
+    pageBadge: 'Configuración Tranquila',
+    pageTitle: 'Ajustes del Andamio',
+    pageSubtitle:
+      'Personaliza tus anclas y tiempos de apoyo. Recuerda que no necesitas configurar nada para empezar.',
+    systemDate: 'Fecha del Sistema',
+    systemDateToday: 'Hoy es {date}',
+    localZone: 'Zona horaria local detectada',
+    synced: 'Sincronizado',
+    anchorsTitle: 'Horarios de Anclas del Día',
+    anchorsSubtitle: 'Puntos de referencia suaves para organizar tu ritmo circadiano.',
+    anchorHints: {
+      despertar: 'Luz natural y vaso de agua',
+      primera_tarea: 'Revisar la primera micro-tarea',
+      movimiento: 'Comer sin pantallas',
+      apagado: 'Cerrar pestañas y respirar',
+    },
+    anchorsNote:
+      'Las anclas son puntos de referencia, no metas fijas. No hay penalización si tu horario cambia.',
+    blocksTitle: 'Bloques de Tiempo',
+    blocksSubtitle:
+      'Estructuras amplias para agrupar energía en lugar de minutos rígidos.',
+    blockKicker: 'Bloque {n}',
+    blockStartLabel: 'Inicio del bloque {label}',
+    blockEndLabel: 'Fin del bloque {label}',
+    blockRangeTo: 'a',
+    focusDurationTitle: 'Duración de Enfoque Predeterminada',
+    focusDurationSubtitle:
+      'Tiempo de la sesión antes de invitarte a una pausa no obligatoria.',
+    focusDurationLabel: 'Selección de minutos de enfoque',
+    focusDurationHint:
+      'Elige bloques cortos para evitar la fatiga mental y facilitar el inicio.',
+    dataTitle: 'Tus Datos y Privacidad Local',
+    dataBody:
+      'Tus datos viven únicamente en la memoria local de este navegador (localStorage). No existen servidores externos, ni cuentas de usuario, ni cookies de rastreo publicitario.',
+    backupHint: 'Copia de tus notas y anclas',
+    exportAction: 'Descargar copia de seguridad (JSON)',
+    importLabel: 'Importar respaldo',
+    restoreAction: 'Restaurar desde archivo JSON',
+    importReplaceHint:
+      'Reemplazará los datos actuales en este equipo sin enviar nada a internet.',
+    clearLabel: 'Limpiar datos locales',
+    clearAria: 'Borrar todos los datos guardados en este navegador',
+    clearConfirmTitle: '¿Borrar todos los datos locales?',
+    clearConfirmBody:
+      'Se eliminarán tus anclas, bloques, tareas, respuestas semanales y preferencias guardadas en este navegador. Esta acción no se puede deshacer.',
+    clearConfirmAction: 'Borrar todo',
   },
 
   disclaimer: {
