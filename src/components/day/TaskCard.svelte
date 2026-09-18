@@ -4,11 +4,15 @@
   // setTaskDone action, which resolves the task source without the
   // component knowing where it lives. Every pending task also offers
   // "Iniciar enfoque", which sets the focus candidate and switches to the
-  // focus view; completed tasks show a calm check mark instead.
+  // focus view; completed tasks show a calm check mark instead. The
+  // delete button calls the store's removeTask, which resolves the task
+  // the same way and also clears a dangling focus session.
   import { actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
 
   let { task } = $props();
+
+  const deleteLabel = $derived(copy.day.deleteTaskAria.replace('{task}', task.title));
 
   function onCheck(event) {
     actions.setTaskDone(task.id, event.currentTarget.checked);
@@ -16,6 +20,10 @@
 
   function startFocus() {
     actions.startFocusFromTask(task.id);
+  }
+
+  function onDelete() {
+    actions.removeTask(task.id);
   }
 </script>
 
@@ -36,6 +44,9 @@
       {copy.day.startFocus}
     </button>
   {/if}
+  <button class="delete" type="button" onclick={onDelete} aria-label={deleteLabel}>
+    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+  </button>
 </li>
 
 <style>
@@ -126,5 +137,31 @@
 
   .done-mark .material-symbols-outlined {
     font-size: 22px;
+  }
+
+  .delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-soft, #6b7280);
+    border-radius: var(--radius-field, 12px);
+    transition: var(--transition-gentle, all 180ms ease-out);
+  }
+
+  .delete:hover,
+  .delete:focus-visible {
+    background: rgba(146, 64, 14, 0.08);
+    color: var(--danger, #92400e);
+  }
+
+  .delete .material-symbols-outlined {
+    font-size: 20px;
   }
 </style>
