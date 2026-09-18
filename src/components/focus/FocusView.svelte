@@ -1,11 +1,15 @@
 <script>
   // Focus mode (spec: Focus Mode). Exactly one task is visible at a time —
   // the rest sit behind the "next task" affordance on the reward step (no
-  // todo wall). Stages: picker -> one task + primer paso + countdown ->
-  // reward -> next/back. Timer math runs through the delta-based timer API;
-  // this component only drives ticks and renders store state.
+  // todo wall). Stages: picker -> primer paso helper + task hero + countdown
+  // -> reward -> next/back. Esc anywhere in the focus view returns to the
+  // day with the calm exit (no completion, nothing counted); the capture
+  // modal keeps its own Esc handling while open. Timer math runs through
+  // the delta-based timer API; this component only drives the view state.
+  import { onMount } from 'svelte';
   import { appState, focus, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
+  import { uiState } from '../../lib/store/capture.svelte.js';
   import PrimerPasoHelper from './PrimerPasoHelper.svelte';
   import Countdown from './Countdown.svelte';
   import RewardStep from './RewardStep.svelte';
@@ -32,6 +36,12 @@
   const inSession = $derived(focus.currentTask !== null);
   const rewarded = $derived(focus.reward !== null);
 
+  // Block chip label: the task's block when assigned, "Sin asignar" for
+  // captures and week priorities.
+  const blockLabel = $derived(
+    focus.currentTask?.blockId ? copy.day.blocks[focus.currentTask.blockId] : copy.day.unassigned,
+  );
+
   function pick(task) {
     primerPaso = '';
     tooBig = false;
@@ -44,30 +54,51 @@
     if (next) actions.startFocus(next.taskId);
   }
 
-  function goBackToDay() {
+  // Calm exit (spec: "Salir con calma al día" / Esc): back to the day view
+  // without marking anything done — nothing is lost and nothing counts.
+  function exitCalmly() {
     actions.timerReset();
     actions.setView('day');
   }
+
+  onMount(() => {
+    function onKeydown(event) {
+      if (uiState.captureOpen || event.key !== 'Escape') return;
+      event.preventDefault();
+      exitCalmly();
+    }
+    window.addEventListener('keydown', onKeydown);
+    return () => window.removeEventListener('keydown', onKeydown);
+  });
 </script>
 
 <div class="focus-view">
-  <h2>{copy.focus.title}</h2>
-
   {#if rewarded}
     <RewardStep
       taskTitle={focus.reward.title}
       hasNext={pending.length > 0}
       onnext={goNext}
-      onback={goBackToDay}
+      onback={exitCalmly}
     />
   {:else if inSession}
-    <p class="hint">{copy.focus.oneTaskHint}</p>
-    <article class="session-task card">
-      <h3>{focus.currentTask.title}</h3>
-    </article>
     <PrimerPasoHelper bind:primerPaso bind:tooBig />
-    <Countdown />
+    <article class="task-hero">
+      <div class="hero-top">
+        <span class="block-chip">
+          <span class="block-dot" aria-hidden="true"></span>
+          {copy.focus.blockChip.replace('{label}', blockLabel)}
+        </span>
+        <span class="one-thing">
+          <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+          {copy.focus.oneThingAtATime}
+        </span>
+      </div>
+      <h1 class="task-title">{focus.currentTask.title}</h1>
+    </article>
+    <Countdown onexit={exitCalmly} />
   {:else if pending.length > 0}
+    <PrimerPasoHelper bind:primerPaso bind:tooBig />
+    <h1 class="pick-heading">{copy.focus.title}</h1>
     <p class="hint">{copy.focus.chooseTaskHint}</p>
     <ul class="picker">
       {#each pending as task (task.taskId)}
@@ -79,6 +110,8 @@
       {/each}
     </ul>
   {:else}
+    <PrimerPasoHelper bind:primerPaso bind:tooBig />
+    <h1 class="pick-heading">{copy.focus.title}</h1>
     <p class="empty">{copy.focus.noTasks}</p>
   {/if}
 </div>
@@ -93,28 +126,97 @@
     margin-inline: auto;
   }
 
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
+  .task-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    border-radius: var(--radius-card);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
   }
 
-  h3 {
+  .hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .block-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-button);
+    background: var(--surface-container);
+    color: var(--accent);
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    letter-spacing: var(--letter-spacing-label-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .block-dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .one-thing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    color: var(--text-soft);
+  }
+
+  .one-thing .material-symbols-outlined {
+    font-size: var(--font-size-label-md);
+  }
+
+  .task-title {
     margin: 0;
-    font-size: 1.15rem;
+    font-family: var(--font-display);
+    font-size: var(--font-size-headline-sm);
+    line-height: var(--line-height-headline-sm);
+    letter-spacing: -0.01em;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text);
+  }
+
+  @media (min-width: 48rem) {
+    .task-title {
+      font-size: var(--font-size-headline-md);
+      line-height: var(--line-height-headline-md);
+    }
+  }
+
+  .pick-heading {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-headline-lg-mobile);
+    line-height: var(--line-height-headline-lg-mobile);
+    letter-spacing: var(--letter-spacing-headline-lg-mobile);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (min-width: 48rem) {
+    .pick-heading {
+      font-size: var(--font-size-headline-lg);
+      line-height: var(--line-height-headline-lg);
+      letter-spacing: var(--letter-spacing-headline-lg);
+    }
   }
 
   .hint {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--text-soft, #6b7280);
-  }
-
-  .card {
-    padding: 1rem 1.1rem;
-    border-radius: 0.9rem;
-    background: var(--card-bg, #ffffff);
-    box-shadow: var(--shadow-soft, 0 1px 4px rgba(15, 23, 42, 0.08));
-    border: 1px solid var(--border, #e5e7eb);
+    color: var(--text-soft);
   }
 
   .picker {
@@ -132,15 +234,15 @@
     text-align: left;
     padding: 0.8rem 1rem;
     border-radius: 0.7rem;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border, #e5e7eb);
-    color: var(--text, #1f2937);
-    box-shadow: var(--shadow-soft, 0 1px 4px rgba(15, 23, 42, 0.08));
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-shadow: var(--shadow-soft);
   }
 
   .empty {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--text-soft, #6b7280);
+    color: var(--text-soft);
   }
 </style>
