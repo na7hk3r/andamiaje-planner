@@ -1,8 +1,10 @@
 <script>
   // Top navigation bar (design: TopNavBar shared anchor). Desktop shows the
-  // brand, the capture pill trigger, the view pills and the trailing icons;
-  // below md the pills hide and the bottom mobile nav takes over (App.svelte).
-  // `onnavigate` is wired by App.svelte so all hash routing stays in one place.
+  // brand, the capture pill trigger, the view pills and the privacy
+  // shortcut; below md the pills hide and the bottom mobile nav takes
+  // over (App.svelte). Settings has a single clear path: the navbar
+  // (desktop pills / mobile bottom nav). `onnavigate` is wired by
+  // App.svelte so all hash routing stays in one place.
   import { appState, VIEWS } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import { openCapture } from '../../lib/store/capture.svelte.js';
@@ -58,9 +60,6 @@
       >
         <span class="material-symbols-outlined" aria-hidden="true">lock_open</span>
       </button>
-      <span class="icon-button" aria-hidden="true">
-        <span class="material-symbols-outlined">tune</span>
-      </span>
     </div>
   </div>
 </header>

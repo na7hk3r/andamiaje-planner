@@ -53,6 +53,7 @@
   .task-card {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-sm, 0.5rem);
     min-width: 0;
     padding: 0.35rem 0.5rem 0.35rem 0.25rem;
@@ -66,7 +67,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    flex: 1;
+    flex: 1 1 12rem;
     min-width: 0;
     cursor: pointer;
   }
@@ -89,6 +90,7 @@
   }
 
   .title {
+    min-width: 0;
     font-size: var(--font-size-body-md, 16px);
     line-height: var(--line-height-body-md, 26px);
     color: var(--text, #1f2937);
@@ -115,6 +117,7 @@
     font-size: var(--font-size-label-md, 14px);
     line-height: var(--line-height-label-md, 20px);
     font-weight: var(--font-weight-medium, 500);
+    white-space: nowrap;
     transition: var(--transition-gentle, all 180ms ease-out);
   }
 

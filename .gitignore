@@ -1,4 +1,5 @@
 node_modules/
 dist/
+docs/mock-state.json
 *.local
 .DS_Store

@@ -53,7 +53,6 @@ export const copy = {
     capturePlaceholder: 'Buscar o capturar…',
     shortcut: 'Ctrl K',
     privacyButton: 'Privacidad local activa',
-    tuneButton: 'Ajustes de visualización',
   },
 
   day: {

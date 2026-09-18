@@ -135,6 +135,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: var(--space-sm, 0.5rem);
     min-width: 0;
     border-bottom: 1px solid var(--surface-container, #f0f4f8);
@@ -162,6 +163,7 @@
   .time {
     width: 5.2rem;
     min-width: 0;
+    flex: 0 0 auto;
     padding: 0;
     border: none;
     background: transparent;

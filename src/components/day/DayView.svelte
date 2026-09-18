@@ -272,7 +272,10 @@
     min-width: 0;
   }
 
-  @media (min-width: 48rem) {
+  /* Three columns only on wide screens: task rows need ~220px+
+     of breathing room, otherwise fixed-width actions squeeze the
+     title down to one letter per line. */
+  @media (min-width: 64rem) {
     .block-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }

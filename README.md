@@ -1,5 +1,7 @@
 # Andamiaje
 
+![Banner Andamiaje](banner-readme.png)
+
 ![version](https://img.shields.io/badge/version-0.1.0-334155?style=flat-square) ![svelte](https://img.shields.io/badge/svelte-5-475569?style=flat-square) ![vite](https://img.shields.io/badge/vite-6-64748b?style=flat-square) ![vitest](https://img.shields.io/badge/vitest-3-64748b?style=flat-square) ![local-first](https://img.shields.io/badge/local--first-privacidad-475569?style=flat-square) ![español](https://img.shields.io/badge/idioma-espa%C3%B1ol_neutro-334155?style=flat-square)
 
 Un andamio amable para tu atención y tu día. Organiza tu día con anclas, bloques y un primer paso claro.
@@ -8,9 +10,6 @@ Un andamio amable para tu atención y tu día. Organiza tu día con anclas, bloq
 
 Andamiaje es un planificador de rutinas diarias local-first, pensado para acompañar la atención sin exigencias ni culpa. Está dirigido a personas que buscan estructura suave: puntos de apoyo a lo largo del día, una sola tarea a la vez y un cierre tranquilo.
 
-![Captura pendiente](docs/screenshot.png)
-
-> Captura de la aplicación pendiente de agregar.
 
 ## Funciones principales
 
