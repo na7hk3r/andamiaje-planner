@@ -8,7 +8,20 @@
 export const copy = {
   app: {
     title: 'Andamiaje',
+    subtitle: 'Un andamio amable para tu atención y tu día',
     tagline: 'Organiza tu día con anclas, bloques y un primer paso claro.',
+  },
+
+  welcome: {
+    intro:
+      'Una herramienta pensada para acompañar tu mente sin exigencias, sin cadenas que cuidar ni notificaciones urgentes.',
+    healthTitle: 'Aviso de salud',
+    healthBody:
+      'No sustituye la evaluación de un profesional de la salud ni reemplaza un plan de apoyo profesional. Es únicamente un andamio personal para facilitar tu organización.',
+    privacyBody:
+      'Tus datos viven exclusivamente en este navegador. Sin cuentas, sin nube, sin rastreo.',
+    cta: 'Comenzar mi día',
+    microcopy: 'Paso 1 de 1 · Sin compromisos ni configuración obligatoria',
   },
 
   common: {

@@ -69,15 +69,38 @@
 
 {#if !appState.disclaimerAccepted}
   <main class="gate">
-    <h1>{copy.app.title}</h1>
-    <p class="tagline">{copy.app.tagline}</p>
-    <section class="disclaimer-card">
-      <h2>{copy.disclaimer.title}</h2>
-      <p>{copy.disclaimer.body}</p>
-      <button class="primary" type="button" onclick={actions.acknowledgeDisclaimer}>
-        {copy.disclaimer.acknowledge}
-      </button>
-    </section>
+    <article class="gate-card">
+      <div class="gate-header">
+        <span class="gate-isotipo" aria-hidden="true">
+          <span class="material-symbols-outlined">spa</span>
+        </span>
+        <h1>{copy.app.title}</h1>
+        <p class="tagline">{copy.app.subtitle}</p>
+      </div>
+      <p class="intro">{copy.welcome.intro}</p>
+      <section class="notice-card">
+        <span class="notice-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">health_and_safety</span>
+        </span>
+        <div class="notice-body">
+          <h2>{copy.welcome.healthTitle}</h2>
+          <p>{copy.welcome.healthBody}</p>
+        </div>
+      </section>
+      <section class="privacy-card">
+        <span class="privacy-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">lock</span>
+        </span>
+        <p>{copy.welcome.privacyBody}</p>
+      </section>
+      <div class="gate-cta">
+        <button class="primary cta" type="button" onclick={actions.acknowledgeDisclaimer}>
+          {copy.welcome.cta}
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+        </button>
+        <p class="microcopy">{copy.welcome.microcopy}</p>
+      </div>
+    </article>
   </main>
 {:else}
   <main class="shell" id="top">
@@ -280,47 +303,178 @@
 
   .gate {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding: 3rem 1.25rem;
-    max-width: 30rem;
-    margin-inline: auto;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--space-lg) var(--gutter-mobile);
+  }
+
+  .gate-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+    max-width: 42.5rem;
+    padding: var(--space-lg);
+    border-radius: var(--radius-card);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-paper);
     text-align: center;
   }
 
-  h1 {
-    margin: 0;
-    font-size: 1.7rem;
+  @media (min-width: 48rem) {
+    .gate-card {
+      padding: var(--space-xl);
+    }
+  }
+
+  .gate-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .gate-isotipo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--space-xs);
+    border-radius: 50%;
+    background: var(--accent-soft);
     color: var(--accent);
+  }
+
+  .gate-isotipo .material-symbols-outlined {
+    font-size: 28px;
+  }
+
+  .gate-card h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-headline-lg-mobile);
+    line-height: var(--line-height-headline-lg-mobile);
+    letter-spacing: var(--letter-spacing-headline-lg-mobile);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text);
+  }
+
+  @media (min-width: 48rem) {
+    .gate-card h1 {
+      font-size: var(--font-size-headline-lg);
+      line-height: var(--line-height-headline-lg);
+      letter-spacing: var(--letter-spacing-headline-lg);
+    }
   }
 
   .tagline {
     margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-headline-sm);
+    line-height: var(--line-height-headline-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--accent);
+  }
+
+  .intro {
+    margin: 0;
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
     color: var(--text-soft);
   }
 
-  .disclaimer-card {
+  .notice-card {
     display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    padding: 1.4rem 1.3rem;
-    border-radius: 1rem;
-    background: var(--card-bg);
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border);
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-card);
+    background: var(--accent-soft);
     text-align: left;
   }
 
-  .disclaimer-card h2 {
-    margin: 0;
-    font-size: 1.2rem;
+  .notice-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--card-bg);
+    color: var(--accent);
   }
 
-  .disclaimer-card p {
+  .notice-body h2 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text);
+  }
+
+  .notice-body p {
     margin: 0;
-    line-height: 1.55;
-    font-size: 0.95rem;
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+    color: var(--text-secondary);
+  }
+
+  .privacy-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-card);
+    background: var(--surface-container);
+    text-align: left;
+  }
+
+  .privacy-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--card-bg);
+    color: var(--success);
+  }
+
+  .privacy-card p {
+    margin: 0;
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+    color: var(--text-secondary);
+  }
+
+  .gate-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-button);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-body-md);
+  }
+
+  .microcopy {
+    margin: 0;
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    letter-spacing: var(--letter-spacing-label-sm);
+    color: var(--text-soft);
   }
 
   .shell {
