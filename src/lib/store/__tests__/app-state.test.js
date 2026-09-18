@@ -547,7 +547,7 @@ describe('persistence — reload edge cases (verify S1/S2)', () => {
     );
     const fresh = await reloadStore();
     expect(fresh.appState.version).toBe(STATE_VERSION);
-    expect(fresh.appState.settings.defaultTimerMin).toBe(25); // clean defaults
+    expect(fresh.appState.settings.defaultTimerMin).toBe(30); // clean defaults
     assertFullShape(fresh.appState);
   });
 

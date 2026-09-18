@@ -94,7 +94,9 @@ function defaultSettings() {
     anchorTimes: { ...DEFAULT_TIMES.anchors },
     blockTimes: { ...DEFAULT_TIMES.blocks },
     blockOrder: [...BLOCK_IDS],
-    defaultTimerMin: 25,
+    // Stitch settings: the focus duration is a 20/30/45 radio group and 30
+    // is the recommended preset, so a fresh start lands on a valid choice.
+    defaultTimerMin: 30,
   };
 }
 
@@ -404,7 +406,7 @@ export const actions = {
     if (!patch || typeof patch !== 'object') return false;
     const next = { ...appState.settings, ...patch };
     const min = Number(next.defaultTimerMin);
-    next.defaultTimerMin = Number.isFinite(min) ? Math.min(120, Math.max(1, min)) : 25;
+    next.defaultTimerMin = Number.isFinite(min) ? Math.min(120, Math.max(1, min)) : 30;
     appState.settings = next;
     applySettingsToDay();
     saveState(appState);
