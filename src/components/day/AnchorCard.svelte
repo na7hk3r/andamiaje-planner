@@ -23,7 +23,10 @@
       type="checkbox"
       checked={anchor.checked}
       onchange={onCheck}
-      aria-label={copy.day.taskDoneLabel}
+      aria-label={copy.day.anchorCheckedLabel.replace(
+        '{label}',
+        copy.day.anchors[anchor.id],
+      )}
     />
     <span class="name">{copy.day.anchors[anchor.id]}</span>
   </label>

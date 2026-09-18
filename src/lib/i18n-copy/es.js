@@ -47,6 +47,7 @@ export const copy = {
     },
     anchorTimeLabel: 'Hora de la ancla',
     anchorEditHint: 'Toca la hora para ajustarla.',
+    anchorCheckedLabel: 'Marcar ancla {label} como completada',
     blocksTitle: 'Bloques',
     blocks: {
       manana: 'Mañana',
