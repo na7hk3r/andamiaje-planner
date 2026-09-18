@@ -203,6 +203,40 @@ export const copy = {
     prioritiesMax: 'Máximo 3 prioridades.',
     resumeRitual: 'Retomar el ritual donde lo dejaste.',
     nudgeWeekly: 'Un momento semanal fijo ayuda a mantener el ritmo.',
+
+    // Stitch "Vista Semana" copy — calm stepper, gentle review, priorities
+    // with a protective limit, and a suggested (never enforced) distribution.
+    pageTitle: 'Ritual Semanal de Descarga y Planificación',
+    pageSubtitle:
+      'Un momento tranquilo para cerrar la semana y preparar el terreno de la siguiente, sin autoexigencias.',
+    resumeBanner:
+      'Retomar el ritual semanal cuando tengas 10 minutos de calma. Puedes pausar en cualquier momento.',
+    pauseForToday: 'Pausar por hoy',
+    stepperLabel: 'Progreso del ritual semanal',
+    stepNumber: 'Paso {n}',
+    stepInProgress: 'En curso',
+    reviewTitle: 'Revisión amable de la semana',
+    reviewSubtitle:
+      'Espacio seguro para registrar lo que funcionó, sin métricas ni castigos.',
+    savedLocally: 'Guardado localmente',
+    prioritiesTitle: '3 Prioridades de la semana',
+    prioritiesSubtitle: 'Para no sobrecargar la memoria de trabajo.',
+    prioritiesProtection:
+      'Máximo 3 prioridades seleccionadas. Esto protege tu capacidad de atención y reduce la sensación de agobio.',
+    prioritiesCalmLimit: 'Límite de 3 alcanzado con calma',
+    removePriorityAria: 'Quitar prioridad {n}',
+    distributionTitle: 'Distribución sugerida en la semana',
+    distributionSubtitle:
+      'Tus prioridades ancladas en bloques amplios y realistas, sin horas fijas.',
+    weekRange: '{start} — {end}',
+    priorityTag: 'Prioridad {n}',
+    bufferFree: 'Buffer libre',
+    bufferFreeBody: 'Espacio sin compromisos y cierre suave',
+    softBuffer: 'Espacio suave de descarga',
+    completeBanner: 'Ritual semanal listo. Gracias por cuidar tu ritmo.',
+    completeBody:
+      'No hay cadenas que cuidar ni puntajes que mantener. Solo un soporte constante para tu mente.',
+    noJudgment: 'Sin juicio',
     days: [
       'Lunes',
       'Martes',
