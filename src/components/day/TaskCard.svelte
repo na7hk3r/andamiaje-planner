@@ -1,7 +1,10 @@
 <script>
-  // A task row used across the day view (blocks and unassigned captures).
-  // Done state flips through the store's generic setTaskDone action, which
-  // resolves the task source without the component knowing where it lives.
+  // A task row used across the day view (blocks and unassigned captures;
+  // Stitch "Vista Día"). The done toggle flips through the store's generic
+  // setTaskDone action, which resolves the task source without the
+  // component knowing where it lives. Every pending task also offers
+  // "Iniciar enfoque", which sets the focus candidate and switches to the
+  // focus view; completed tasks show a calm check mark instead.
   import { actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
 
@@ -10,31 +13,118 @@
   function onCheck(event) {
     actions.setTaskDone(task.id, event.currentTarget.checked);
   }
+
+  function startFocus() {
+    actions.startFocusFromTask(task.id);
+  }
 </script>
 
-<label class="task-card">
-  <input type="checkbox" checked={task.done} onchange={onCheck} aria-label={copy.day.taskDoneLabel} />
-  <span class="title" class:done={task.done}>{task.title}</span>
-</label>
+<li class="task-card" class:is-done={task.done}>
+  <label class="main">
+    <span class="envelope">
+      <input type="checkbox" checked={task.done} onchange={onCheck} aria-label={copy.day.taskDoneLabel} />
+    </span>
+    <span class="title">{task.title}</span>
+  </label>
+  {#if task.done}
+    <span class="done-mark" aria-hidden="true">
+      <span class="material-symbols-outlined">check_circle</span>
+    </span>
+  {:else}
+    <button class="focus" type="button" onclick={startFocus}>
+      <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+      {copy.day.startFocus}
+    </button>
+  {/if}
+</li>
 
 <style>
   .task-card {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.7rem;
-    border-radius: 0.6rem;
+    gap: var(--space-sm, 0.5rem);
+    padding: 0.35rem 0.5rem 0.35rem 0.25rem;
+    border-radius: var(--radius-field, 12px);
     background: var(--bg, #fafafa);
+    border: 1px solid var(--border, #dbe3eb);
+    transition: var(--transition-gentle, all 180ms ease-out);
+  }
+
+  .main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .envelope {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+  }
+
+  .envelope input {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    accent-color: var(--success, #2f7d4f);
     cursor: pointer;
   }
 
   .title {
-    font-size: 0.95rem;
+    font-size: var(--font-size-body-md, 16px);
+    line-height: var(--line-height-body-md, 26px);
     color: var(--text, #1f2937);
+    overflow-wrap: anywhere;
   }
 
-  .done {
+  .is-done .title {
     text-decoration: line-through;
     color: var(--text-soft, #6b7280);
+  }
+
+  .focus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-field, 12px);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #dbe3eb);
+    color: var(--accent, #4f6b8a);
+    font-size: var(--font-size-label-md, 14px);
+    line-height: var(--line-height-label-md, 20px);
+    font-weight: var(--font-weight-medium, 500);
+    transition: var(--transition-gentle, all 180ms ease-out);
+  }
+
+  .focus:hover {
+    background: var(--accent-soft, #eff4fa);
+  }
+
+  .focus .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .done-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    color: var(--success, #2f7d4f);
+  }
+
+  .done-mark .material-symbols-outlined {
+    font-size: 22px;
   }
 </style>

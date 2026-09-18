@@ -109,7 +109,7 @@
       </header>
       <ul class="captured-list">
         {#each appState.day.captured as task (task.id)}
-          <li><TaskCard {task} /></li>
+          <TaskCard {task} />
         {/each}
       </ul>
     </section>
