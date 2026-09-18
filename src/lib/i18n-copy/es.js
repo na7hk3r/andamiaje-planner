@@ -27,6 +27,7 @@ export const copy = {
   },
 
   nav: {
+    sectionLabel: 'Secciones',
     day: 'Día',
     focus: 'Enfoque',
     week: 'Semana',

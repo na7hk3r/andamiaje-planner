@@ -66,7 +66,7 @@
         <SettingsView />
       {/if}
     </div>
-    <nav class="nav" aria-label="Secciones">
+    <nav class="nav" aria-label={copy.nav.sectionLabel}>
       {#each VIEWS as view (view)}
         <button
           class="nav-item"
