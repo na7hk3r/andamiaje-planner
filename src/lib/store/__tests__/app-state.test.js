@@ -394,6 +394,38 @@ describe('actions — timer (slice-1 Timer interface)', () => {
   });
 });
 
+describe('actions — start focus from a task (Day view bridge)', () => {
+  it('sets the focus candidate and switches to the focus view', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'mediodia');
+    const task = block.tasks[0];
+    expect(actions.startFocusFromTask(task.id)).toBe(true);
+    expect(focus.currentTask).toEqual({
+      taskId: task.id,
+      title: task.title,
+      source: 'block',
+      blockId: 'mediodia',
+    });
+    expect(appState.view).toBe('focus');
+    expect(actions.startFocusFromTask('missing-task')).toBe(false);
+    expect(appState.view).toBe('focus'); // failed lookup leaves the view untouched
+    actions.setView('day');
+  });
+
+  it('resolves unassigned captures the same way', () => {
+    actions.capture('Enfocar en un rato');
+    const captured = appState.day.captured.at(-1);
+    expect(actions.startFocusFromTask(captured.id)).toBe(true);
+    expect(focus.currentTask).toEqual({
+      taskId: captured.id,
+      title: captured.title,
+      source: 'captured',
+      blockId: null,
+    });
+    expect(appState.view).toBe('focus');
+    actions.setView('day');
+  });
+});
+
 describe('actions — export / import roundtrip', () => {
   it('roundtrips field-for-field through import', () => {
     const exported = JSON.parse(actions.exportJson());

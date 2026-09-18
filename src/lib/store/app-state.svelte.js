@@ -436,6 +436,20 @@ export const actions = {
     return true;
   },
 
+  // "Iniciar enfoque" from a task card (Stitch Day view): sets the focus
+  // candidate and moves straight into the focus view, skipping the picker.
+  // FocusView already renders the session whenever focus.currentTask is set,
+  // so this is the only bridge the day view needs.
+  startFocusFromTask(taskId) {
+    const current = findTask(taskId);
+    if (!current) return false;
+    focus.currentTask = current;
+    focus.reward = null;
+    appState.view = 'focus';
+    saveState(appState);
+    return true;
+  },
+
   startTimer(durationMs) {
     const d = Number.isFinite(durationMs)
       ? Math.max(0, durationMs)
