@@ -21,6 +21,9 @@ export const copy = {
     confirm: 'Confirmar',
     done: 'Hecho',
     remove: 'Quitar',
+    back: 'Atrás',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
   },
 
   nav: {
@@ -87,6 +90,11 @@ export const copy = {
     timerVisibleNote:
       'El temporizador cuenta solo mientras la app está visible.',
     timerDone: 'Tiempo completo',
+    timerCustomMinutes: 'Minutos',
+    noTasks: 'Todavía no hay tareas para enfocar.',
+    chooseTaskHint: 'Elige una tarea y ocúpate solo de ella.',
+    nextTask: 'Siguiente tarea',
+    backToDay: 'Volver al día',
     rewardTitle: 'Recompensa',
     rewardTaskDone: 'Tarea marcada como hecha.',
     rewardSuggestions:
@@ -114,6 +122,21 @@ export const copy = {
     prioritiesMax: 'Máximo 3 prioridades.',
     resumeRitual: 'Retomar el ritual donde lo dejaste.',
     nudgeWeekly: 'Un momento semanal fijo ayuda a mantener el ritmo.',
+    days: [
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+      'Domingo',
+    ],
+    scheduleDay: 'Día',
+    scheduleBlock: 'Bloque',
+    scheduled: 'Programada',
+    noPriorities: 'Elige al menos una prioridad antes de programar.',
+    ritualComplete: 'Ritual semanal listo.',
+    startNewReview: 'Iniciar una nueva revisión.',
   },
 
   recovery: {
@@ -140,6 +163,7 @@ export const copy = {
     import: 'Importar datos',
     exportHint: 'Guarda una copia de tu plan en un archivo JSON.',
     importHint: 'Reemplaza el plan actual con el archivo importado.',
+    importError: 'El archivo no es un plan válido.',
   },
 
   disclaimer: {
