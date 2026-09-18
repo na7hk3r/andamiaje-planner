@@ -218,6 +218,16 @@ describe('actions — blocks', () => {
     expect(state.day.blocks.map((b) => b.id)).toEqual(['manana', 'mediodia', 'tarde']);
     expect(state.settings.blockOrder).toEqual(['manana', 'mediodia', 'tarde']);
   });
+
+  it('marks a task done or not wherever it lives', () => {
+    const manana = state.day.blocks.find((b) => b.id === 'manana');
+    const task = manana.tasks[0];
+    expect(actions.setTaskDone(task.id, true)).toBe(true);
+    expect(manana.tasks[0].done).toBe(true);
+    expect(actions.setTaskDone(task.id, false)).toBe(true);
+    expect(manana.tasks[0].done).toBe(false);
+    expect(actions.setTaskDone('missing-task', true)).toBe(false);
+  });
 });
 
 describe('actions — quick capture', () => {

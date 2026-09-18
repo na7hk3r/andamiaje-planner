@@ -280,6 +280,28 @@ export const actions = {
     return true;
   },
 
+  // Marks any task done / undone wherever it lives: day blocks, unassigned
+  // captures, or week priorities. Mirrors the findTask resolution used by
+  // startFocus and completeCurrentTask so the UI never reimplements lookup.
+  setTaskDone(taskId, done) {
+    const current = findTask(taskId);
+    if (!current) return false;
+    const flag = Boolean(done);
+    if (current.source === 'block') {
+      const block = state.day.blocks.find((b) => b.id === current.blockId);
+      const task = block?.tasks.find((t) => t.id === taskId);
+      if (task) task.done = flag;
+    } else if (current.source === 'captured') {
+      const task = state.day.captured.find((t) => t.id === taskId);
+      if (task) task.done = flag;
+    } else {
+      const task = state.week.priorities.find((t) => t.id === taskId);
+      if (task) task.done = flag;
+    }
+    saveState(state);
+    return true;
+  },
+
   // Swap keeps tasks attached: block objects move with their tasks.
   swapBlocks(aId, bId) {
     const blocks = state.day.blocks;
