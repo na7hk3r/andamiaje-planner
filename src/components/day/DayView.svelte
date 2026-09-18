@@ -8,11 +8,18 @@
   import AnchorCard from './AnchorCard.svelte';
   import BlockSection from './BlockSection.svelte';
   import TaskCard from './TaskCard.svelte';
+  import ApagadoChecklist from './ApagadoChecklist.svelte';
 
   let resume = $derived.by(() => {
     const anchor = actions.nextResumeAnchor();
     return anchor ? { id: anchor.id, label: copy.day.anchors[anchor.id] } : null;
   });
+
+  // The ritual rows live inside the apagado anchor (persisted shape); the
+  // day view renders them as the standalone "Ritual de Apagado" section.
+  const apagadoItems = $derived(
+    appState.day.anchors.find((a) => a.id === 'apagado')?.apagadoChecklist ?? [],
+  );
 </script>
 
 <div class="day-view">
@@ -45,6 +52,14 @@
       {/each}
     </div>
   </section>
+
+  {#if apagadoItems.length > 0}
+    <section aria-label={copy.day.apagadoTitle}>
+      <h3>{copy.day.apagadoTitle}</h3>
+      <p class="hint">{copy.day.apagadoSubtitle}</p>
+      <ApagadoChecklist items={apagadoItems} />
+    </section>
+  {/if}
 
   {#if appState.day.captured.length > 0}
     <section aria-label={copy.day.unassigned}>

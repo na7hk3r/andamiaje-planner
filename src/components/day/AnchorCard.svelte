@@ -1,10 +1,10 @@
 <script>
   // One of the four daily anchors (spec: Day View / Four independent
   // anchors). Check state flips only this anchor; the time edit persists
-  // through the store. The apagado anchor renders its embedded checklist.
+  // through the store. The apagado checklist renders in its own
+  // "Ritual de Apagado" section on the day view.
   import { actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
-  import ApagadoChecklist from './ApagadoChecklist.svelte';
 
   let { anchor } = $props();
 
@@ -35,10 +35,6 @@
     <span>{copy.day.anchorTimeLabel}</span>
     <input type="time" value={anchor.time} onchange={onTime} />
   </label>
-
-  {#if anchor.apagadoChecklist}
-    <ApagadoChecklist items={anchor.apagadoChecklist} />
-  {/if}
 </article>
 
 <style>
