@@ -149,6 +149,37 @@ export const copy = {
     rewardTaskDone: 'Tarea marcada como hecha.',
     rewardSuggestions:
       'Sugerencias: un snack, un paseo corto, un episodio o un juego breve.',
+
+    // Stitch "Vista Enfoque" copy — calm, neutral, non-punitive.
+    sustainedFocus: 'Enfoque sostenido',
+    recommended: 'Recomendado',
+    durationLabel: 'Duración del tramo',
+    timerPresetShort: {
+      '20': '20 min',
+      '30': '30 min',
+      '45': '45 min',
+    },
+    blockChip: 'Bloque: {label}',
+    oneThingAtATime: 'Una sola cosa a la vez',
+    pause: 'Pausar',
+    resume: 'Reanudar',
+    completeTramo: 'Completar tramo',
+    exitCalmly: 'Salir con calma al día',
+    shortcutsLead: 'Presiona',
+    shortcutsPause: 'para pausar o reanudar',
+    shortcutsExit: 'para salir al día',
+    shortcutsSep: '·',
+    keys: {
+      space: 'Espacio',
+      escape: 'Esc',
+    },
+    startedAnnounce: 'Temporizador iniciado',
+    pausedAnnounce: 'Temporizador en pausa',
+    resumedAnnounce: 'Temporizador en marcha',
+    rewardStaticTitle:
+      '¡Tramo completado! Tómate un respiro, bebe agua o estira la espalda.',
+    rewardStaticBody:
+      'Tu esfuerzo ya sumó. Sin apresurarte ni evaluarte con exigencia.',
   },
 
   week: {
