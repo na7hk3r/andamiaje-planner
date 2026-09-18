@@ -1,19 +1,23 @@
 <script>
-  // Reward step (spec: Focus Mode / Reward step). Shown when the countdown
-  // ends and the store marks the task done: a brief, calm celebration and
-  // sensory suggestions. The next-task affordance keeps other tasks hidden
-  // behind it instead of showing a wall of pending todos.
+  // Reward step (spec: Focus Mode / Calm static reward banner). Shown when
+  // the countdown ends or a tramo is completed early: a grounded, static
+  // celebration — no confetti, no entrance animation, no motion. Safe by
+  // construction under prefers-reduced-motion. The next-task affordance
+  // keeps other tasks hidden behind it instead of a wall of pending todos.
   import { copy } from '../../lib/i18n-copy/es.js';
 
   let { taskTitle, hasNext = false, onnext = () => {}, onback = () => {} } = $props();
 </script>
 
 <section class="reward" role="status" aria-live="polite">
-  <div class="reward-pop">
-    <h3>{copy.focus.rewardTitle}</h3>
+  <div class="reward-icon" aria-hidden="true">
+    <span class="material-symbols-outlined">spark</span>
+  </div>
+  <div class="reward-body">
+    <h2 class="reward-title">{copy.focus.rewardStaticTitle}</h2>
     <p class="task-title">{taskTitle}</p>
-    <p class="done-line">{copy.focus.rewardTaskDone}</p>
-    <p class="suggestions">{copy.focus.rewardSuggestions}</p>
+    <p class="meta">{copy.focus.rewardTaskDone}</p>
+    <p class="body">{copy.focus.rewardStaticBody}</p>
     <div class="actions">
       {#if hasNext}
         <button class="primary" type="button" onclick={onnext}>
@@ -30,58 +34,66 @@
 <style>
   .reward {
     display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-card);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .reward-icon {
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #e8f4ee;
+    background: color-mix(in srgb, var(--success) 14%, var(--card-bg));
+    color: var(--success);
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
   }
 
-  .reward-pop {
+  .reward-icon .material-symbols-outlined {
+    font-size: 24px;
+    font-variation-settings: 'FILL' 1;
+  }
+
+  .reward-body {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.7rem;
-    text-align: center;
-    padding: 2rem 1.5rem;
-    border-radius: 1rem;
-    background: var(--card-bg, #ffffff);
-    box-shadow: var(--shadow-soft, 0 1px 4px rgba(15, 23, 42, 0.08));
-    border: 1px solid var(--border, #e5e7eb);
-    animation: reward-pop 0.6s ease-out;
-    max-width: 24rem;
+    gap: 0.35rem;
   }
 
-  h3 {
+  .reward-title {
     margin: 0;
-    font-size: 1.3rem;
-    color: var(--accent, #4f6b8a);
+    font-size: var(--font-size-label-md);
+    line-height: var(--line-height-label-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text);
   }
 
   .task-title {
     margin: 0;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
+    color: var(--accent);
   }
 
-  .done-line,
-  .suggestions {
+  .meta,
+  .body {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--text-soft, #6b7280);
+    color: var(--text-secondary);
   }
 
   .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.6rem;
     margin-top: 0.6rem;
-  }
-
-  @keyframes reward-pop {
-    0% {
-      opacity: 0;
-      transform: scale(0.94);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
   }
 </style>
