@@ -144,7 +144,7 @@ function hydrate() {
   return stored ? mergeWithDefaults(stored) : defaultState();
 }
 
-export const state = $state(hydrate());
+export const appState = $state(hydrate());
 
 // Transient focus + timer state (design D2: the timer lives in the store).
 // Deliberately NOT part of the persisted AppState: a countdown is
@@ -163,13 +163,13 @@ export const focus = $state({
 // Locates a task wherever it lives: day blocks, unassigned captures, or
 // week priorities.
 function findTask(taskId) {
-  for (const block of state.day.blocks) {
+  for (const block of appState.day.blocks) {
     const task = block.tasks.find((t) => t.id === taskId);
     if (task) return { taskId: task.id, title: task.title, source: 'block', blockId: block.id };
   }
-  const captured = state.day.captured.find((t) => t.id === taskId);
+  const captured = appState.day.captured.find((t) => t.id === taskId);
   if (captured) return { taskId: captured.id, title: captured.title, source: 'captured', blockId: null };
-  const priority = state.week.priorities.find((t) => t.id === taskId);
+  const priority = appState.week.priorities.find((t) => t.id === taskId);
   if (priority) return { taskId: priority.id, title: priority.title, source: 'priority', blockId: null };
   return null;
 }
@@ -180,30 +180,30 @@ function completeCurrentTask() {
   const current = focus.currentTask;
   if (!current) return;
   if (current.source === 'block') {
-    const block = state.day.blocks.find((b) => b.id === current.blockId);
+    const block = appState.day.blocks.find((b) => b.id === current.blockId);
     const task = block?.tasks.find((t) => t.id === current.taskId);
     if (task) task.done = true;
   } else if (current.source === 'captured') {
-    const task = state.day.captured.find((t) => t.id === current.taskId);
+    const task = appState.day.captured.find((t) => t.id === current.taskId);
     if (task) task.done = true;
   } else {
-    const task = state.week.priorities.find((t) => t.id === current.taskId);
+    const task = appState.week.priorities.find((t) => t.id === current.taskId);
     if (task) task.done = true;
   }
   focus.reward = { taskId: current.taskId, title: current.title };
-  saveState(state);
+  saveState(appState);
 }
 
 // Settings edits apply to the day immediately (settings spec): anchor and
 // block times sync down, and the block order re-renders the day view.
 function applySettingsToDay() {
-  const { anchorTimes, blockTimes, blockOrder } = state.settings;
-  state.day.anchors = state.day.anchors.map((anchor) => {
+  const { anchorTimes, blockTimes, blockOrder } = appState.settings;
+  appState.day.anchors = appState.day.anchors.map((anchor) => {
     const time = anchorTimes?.[anchor.id];
     return time ? { ...anchor, time } : anchor;
   });
-  const byId = new Map(state.day.blocks.map((b) => [b.id, b]));
-  state.day.blocks = blockOrder.map((id) => byId.get(id)).filter(Boolean);
+  const byId = new Map(appState.day.blocks.map((b) => [b.id, b]));
+  appState.day.blocks = blockOrder.map((id) => byId.get(id)).filter(Boolean);
   for (const id of BLOCK_IDS) {
     const block = byId.get(id);
     if (block && blockTimes?.[id]) block.time = blockTimes[id];
@@ -211,7 +211,7 @@ function applySettingsToDay() {
 }
 
 function syncBlockOrderFromBlocks() {
-  state.settings.blockOrder = state.day.blocks.map((b) => b.id);
+  appState.settings.blockOrder = appState.day.blocks.map((b) => b.id);
 }
 
 // Import replaces all state (local-data spec). Provided fields are taken
@@ -219,64 +219,64 @@ function syncBlockOrderFromBlocks() {
 // fall back to clean defaults so the store never holds a partial shape.
 function applyParsed(payload) {
   const merged = mergeWithDefaults(payload);
-  state.version = merged.version;
-  state.settings = merged.settings;
-  state.day = merged.day;
-  state.week = merged.week;
-  state.view = merged.view;
-  state.disclaimerAccepted = merged.disclaimerAccepted;
+  appState.version = merged.version;
+  appState.settings = merged.settings;
+  appState.day = merged.day;
+  appState.week = merged.week;
+  appState.view = merged.view;
+  appState.disclaimerAccepted = merged.disclaimerAccepted;
 }
 
 export const actions = {
   // --- view + disclaimer ---
   setView(view) {
     if (!VIEWS.includes(view)) return false;
-    state.view = view;
-    saveState(state);
+    appState.view = view;
+    saveState(appState);
     return true;
   },
 
   acknowledgeDisclaimer() {
-    state.disclaimerAccepted = true;
-    saveState(state);
+    appState.disclaimerAccepted = true;
+    saveState(appState);
   },
 
   // --- day anchors (recovery wiring) ---
   setAnchorChecked(id, checked) {
-    state.day.anchors = setAnchorChecked(state.day.anchors, id, Boolean(checked));
-    saveState(state);
+    appState.day.anchors = setAnchorChecked(appState.day.anchors, id, Boolean(checked));
+    saveState(appState);
   },
 
   setAnchorTime(id, time) {
     if (!ANCHOR_IDS.includes(id) || !/^\d{2}:\d{2}$/.test(time)) return false;
-    state.settings.anchorTimes[id] = time;
-    const anchor = state.day.anchors.find((a) => a.id === id);
+    appState.settings.anchorTimes[id] = time;
+    const anchor = appState.day.anchors.find((a) => a.id === id);
     if (anchor) anchor.time = time;
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
   toggleApagadoItem(itemId) {
-    const apagado = state.day.anchors.find((a) => a.id === 'apagado');
+    const apagado = appState.day.anchors.find((a) => a.id === 'apagado');
     const item = apagado?.apagadoChecklist?.find((i) => i.id === itemId);
     if (!item) return;
     item.checked = !item.checked;
-    saveState(state);
+    saveState(appState);
   },
 
   // Resume hint (recovery wiring): next scheduled anchor not yet checked,
   // or null when nothing actionable remains. Pure call, on demand.
   nextResumeAnchor() {
-    return nextResumeAnchor(state.day.anchors, new Date());
+    return nextResumeAnchor(appState.day.anchors, new Date());
   },
 
   // --- blocks ---
   addTask(blockId, title) {
     const clean = String(title ?? '').trim();
-    const block = state.day.blocks.find((b) => b.id === blockId);
+    const block = appState.day.blocks.find((b) => b.id === blockId);
     if (!clean || !block) return false;
     block.tasks.push({ id: uid(), title: clean, done: false });
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
@@ -288,29 +288,29 @@ export const actions = {
     if (!current) return false;
     const flag = Boolean(done);
     if (current.source === 'block') {
-      const block = state.day.blocks.find((b) => b.id === current.blockId);
+      const block = appState.day.blocks.find((b) => b.id === current.blockId);
       const task = block?.tasks.find((t) => t.id === taskId);
       if (task) task.done = flag;
     } else if (current.source === 'captured') {
-      const task = state.day.captured.find((t) => t.id === taskId);
+      const task = appState.day.captured.find((t) => t.id === taskId);
       if (task) task.done = flag;
     } else {
-      const task = state.week.priorities.find((t) => t.id === taskId);
+      const task = appState.week.priorities.find((t) => t.id === taskId);
       if (task) task.done = flag;
     }
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
   // Swap keeps tasks attached: block objects move with their tasks.
   swapBlocks(aId, bId) {
-    const blocks = state.day.blocks;
+    const blocks = appState.day.blocks;
     const i = blocks.findIndex((b) => b.id === aId);
     const j = blocks.findIndex((b) => b.id === bId);
     if (i === -1 || j === -1 || i === j) return false;
     [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
     syncBlockOrderFromBlocks();
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
@@ -319,92 +319,92 @@ export const actions = {
     const clean = String(title ?? '').trim();
     if (!clean) return false;
     const task = { id: uid(), title: clean, done: false };
-    const block = blockId ? state.day.blocks.find((b) => b.id === blockId) : null;
+    const block = blockId ? appState.day.blocks.find((b) => b.id === blockId) : null;
     if (block) block.tasks.push(task);
-    else state.day.captured.push(task);
-    saveState(state);
+    else appState.day.captured.push(task);
+    saveState(appState);
     return true;
   },
 
   // --- week ritual ---
   setReviewAnswers(answers) {
     const list = Array.isArray(answers) ? answers : [];
-    state.week.reviewAnswers = [String(list[0] ?? ''), String(list[1] ?? '')];
-    saveState(state);
+    appState.week.reviewAnswers = [String(list[0] ?? ''), String(list[1] ?? '')];
+    saveState(appState);
   },
 
   setRitualStep(step) {
-    state.week.ritualStep = Math.min(RITUAL_STEPS_MAX, Math.max(1, Number(step) || 1));
-    saveState(state);
+    appState.week.ritualStep = Math.min(RITUAL_STEPS_MAX, Math.max(1, Number(step) || 1));
+    saveState(appState);
   },
 
   // The ritual never advances past step 4 (spec: the 4th step closes it).
   advanceRitualStep() {
-    if (state.week.ritualStep < RITUAL_STEPS_MAX) state.week.ritualStep += 1;
-    saveState(state);
+    if (appState.week.ritualStep < RITUAL_STEPS_MAX) appState.week.ritualStep += 1;
+    saveState(appState);
   },
 
   addPriority(title) {
     const clean = String(title ?? '').trim();
-    if (!clean || state.week.priorities.length >= PRIORITIES_MAX) return false;
-    state.week.priorities.push({ id: uid(), title: clean, done: false });
-    saveState(state);
+    if (!clean || appState.week.priorities.length >= PRIORITIES_MAX) return false;
+    appState.week.priorities.push({ id: uid(), title: clean, done: false });
+    saveState(appState);
     return true;
   },
 
   addPriorityTask(taskId) {
-    if (state.week.priorities.length >= PRIORITIES_MAX) return false;
-    if (state.week.priorities.some((p) => p.id === taskId)) return false;
+    if (appState.week.priorities.length >= PRIORITIES_MAX) return false;
+    if (appState.week.priorities.some((p) => p.id === taskId)) return false;
     const task = findTask(taskId);
     if (!task) return false;
-    state.week.priorities.push({
+    appState.week.priorities.push({
       id: task.taskId,
       title: task.title,
       done: false,
     });
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
   removePriority(taskId) {
-    const before = state.week.priorities.length;
-    state.week.priorities = state.week.priorities.filter((p) => p.id !== taskId);
-    if (state.week.priorities.length !== before) saveState(state);
+    const before = appState.week.priorities.length;
+    appState.week.priorities = appState.week.priorities.filter((p) => p.id !== taskId);
+    if (appState.week.priorities.length !== before) saveState(appState);
   },
 
   schedulePriority(priorityId, day, blockId) {
-    if (!state.week.priorities.some((p) => p.id === priorityId)) return false;
+    if (!appState.week.priorities.some((p) => p.id === priorityId)) return false;
     if (!BLOCK_IDS.includes(blockId)) return false;
-    state.week.schedule.push({ priorityId, day: String(day), blockId });
-    saveState(state);
+    appState.week.schedule.push({ priorityId, day: String(day), blockId });
+    saveState(appState);
     return true;
   },
 
   // --- settings ---
   updateSettings(patch) {
     if (!patch || typeof patch !== 'object') return false;
-    const next = { ...state.settings, ...patch };
+    const next = { ...appState.settings, ...patch };
     const min = Number(next.defaultTimerMin);
     next.defaultTimerMin = Number.isFinite(min) ? Math.min(120, Math.max(1, min)) : 25;
-    state.settings = next;
+    appState.settings = next;
     applySettingsToDay();
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
   setBlockOrder(order) {
     if (!Array.isArray(order) || order.length !== BLOCK_IDS.length) return false;
     if (!BLOCK_IDS.every((id) => order.includes(id))) return false;
-    state.settings.blockOrder = [...order];
+    appState.settings.blockOrder = [...order];
     applySettingsToDay();
-    saveState(state);
+    saveState(appState);
     return true;
   },
 
   setWakeTime(time) {
     if (!/^\d{2}:\d{2}$/.test(time)) return false;
-    state.settings.wakeTime = time;
-    saveState(state);
+    appState.settings.wakeTime = time;
+    saveState(appState);
     return true;
   },
 
@@ -420,7 +420,7 @@ export const actions = {
   startTimer(durationMs) {
     const d = Number.isFinite(durationMs)
       ? Math.max(0, durationMs)
-      : state.settings.defaultTimerMin * 60_000;
+      : appState.settings.defaultTimerMin * 60_000;
     timer.start(d);
     focus.timerDurationMs = d;
     focus.timerRemainingMs = d;
@@ -455,14 +455,14 @@ export const actions = {
 
   // --- export / import (local-data requirement) ---
   exportJson() {
-    return exportState(state);
+    return exportState(appState);
   },
 
   importJson(json) {
     const parsed = importState(json);
     if (!parsed) return false;
     applyParsed(parsed);
-    saveStateImmediate(state);
+    saveStateImmediate(appState);
     return true;
   },
 };

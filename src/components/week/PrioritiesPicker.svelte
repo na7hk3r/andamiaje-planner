@@ -1,12 +1,12 @@
 <script>
   // Weekly priorities (spec: Week Ritual / Elegir — max 3 priorities).
   // The cap is enforced by the store action and by the add button state.
-  import { state, actions, PRIORITIES_MAX } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions, PRIORITIES_MAX } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
 
   let newTitle = $state('');
 
-  const atLimit = $derived(state.week.priorities.length >= PRIORITIES_MAX);
+  const atLimit = $derived(appState.week.priorities.length >= PRIORITIES_MAX);
 
   function add() {
     if (!newTitle.trim()) return;
@@ -16,9 +16,9 @@
 </script>
 
 <div class="priorities">
-  {#if state.week.priorities.length > 0}
+  {#if appState.week.priorities.length > 0}
     <ul>
-      {#each state.week.priorities as priority (priority.id)}
+      {#each appState.week.priorities as priority (priority.id)}
         <li>
           <span>{priority.title}</span>
           <button

@@ -6,7 +6,7 @@
   // the persistent footer disclaimer. Nav labels and all copy come from
   // the i18n module — no literal UI strings here.
   import { onMount } from 'svelte';
-  import { state, actions, VIEWS } from './lib/store/app-state.svelte.js';
+  import { appState, actions, VIEWS } from './lib/store/app-state.svelte.js';
   import { copy } from './lib/i18n-copy/es.js';
   import Footer from './components/layout/Footer.svelte';
   import QuickCapture from './components/layout/QuickCapture.svelte';
@@ -23,12 +23,12 @@
 
   function applyHash() {
     const view = parseHash();
-    if (view && view !== state.view) actions.setView(view);
+    if (view && view !== appState.view) actions.setView(view);
   }
 
   onMount(() => {
     const view = parseHash();
-    if (view && view !== state.view) actions.setView(view);
+    if (view && view !== appState.view) actions.setView(view);
     window.addEventListener('hashchange', applyHash);
     return () => window.removeEventListener('hashchange', applyHash);
   });
@@ -40,7 +40,7 @@
   }
 </script>
 
-{#if !state.disclaimerAccepted}
+{#if !appState.disclaimerAccepted}
   <main class="gate">
     <h1>{copy.app.title}</h1>
     <p class="tagline">{copy.app.tagline}</p>
@@ -56,11 +56,11 @@
   <main class="shell">
     <QuickCapture />
     <div class="view">
-      {#if state.view === 'day'}
+      {#if appState.view === 'day'}
         <DayView />
-      {:else if state.view === 'focus'}
+      {:else if appState.view === 'focus'}
         <FocusView />
-      {:else if state.view === 'week'}
+      {:else if appState.view === 'week'}
         <WeekView />
       {:else}
         <SettingsView />
@@ -70,7 +70,7 @@
       {#each VIEWS as view (view)}
         <button
           class="nav-item"
-          class:active={state.view === view}
+          class:active={appState.view === view}
           type="button"
           onclick={() => navigate(view)}
         >

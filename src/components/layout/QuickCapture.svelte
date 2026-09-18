@@ -2,7 +2,7 @@
   // Quick capture (spec: Quick Capture / Capture everywhere). Exposed on
   // every screen by App.svelte; captures land in a day block when one is
   // chosen, otherwise they stay as unassigned captures in the day view.
-  import { state, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
 
   let title = $state('');
@@ -32,7 +32,7 @@
     <span>{copy.quickCapture.assignToBlock}</span>
     <select bind:value={blockId}>
       <option value="">{copy.quickCapture.unassigned}</option>
-      {#each state.day.blocks as block (block.id)}
+      {#each appState.day.blocks as block (block.id)}
         <option value={block.id}>{block.label}</option>
       {/each}
     </select>

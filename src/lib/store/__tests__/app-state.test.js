@@ -25,7 +25,7 @@ if (typeof localStorage === 'undefined') {
 // The store is imported only after the stub above is installed (top-level
 // await keeps the ordering explicit). Subsequent fresh imports use
 // vi.resetModules() and re-read the stub, simulating an app reload.
-const { state, focus, actions } = await import('../app-state.svelte.js');
+const { appState, focus, actions } = await import('../app-state.svelte.js');
 
 const APPSTATE_KEYS = ['version', 'settings', 'day', 'week', 'view', 'disclaimerAccepted'];
 const SETTINGS_KEYS = ['wakeTime', 'anchorTimes', 'blockTimes', 'blockOrder', 'defaultTimerMin'];
@@ -86,11 +86,11 @@ afterAll(async () => {
 
 describe('fresh store shape (design contract)', () => {
   it('exposes exactly the AppState contract keys with version 1', () => {
-    assertFullShape(state);
-    expect(state.version).toBe(1);
-    expect(state.view).toBe('day');
-    expect(state.disclaimerAccepted).toBe(false);
-    expect(state.week.ritualStep).toBe(1);
+    assertFullShape(appState);
+    expect(appState.version).toBe(1);
+    expect(appState.view).toBe('day');
+    expect(appState.disclaimerAccepted).toBe(false);
+    expect(appState.week.ritualStep).toBe(1);
   });
 
   it('keys the day with the local calendar date on a clean start', async () => {
@@ -99,23 +99,23 @@ describe('fresh store shape (design contract)', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 8, 18, 10, 0));
     const fresh = await reloadStore();
-    expect(fresh.state.day.dateKey).toBe('2026-09-18');
+    expect(fresh.appState.day.dateKey).toBe('2026-09-18');
     vi.useRealTimers();
   });
 
   it('builds 4 independent anchors whose times come from the default schedule', () => {
-    expect(state.day.anchors.map((a) => a.id)).toEqual([
+    expect(appState.day.anchors.map((a) => a.id)).toEqual([
       'despertar',
       'primera_tarea',
       'movimiento',
       'apagado',
     ]);
-    expect(state.day.anchors.map((a) => a.time)).toEqual(['08:00', '12:30', '19:00', '22:30']);
-    expect(state.day.anchors.every((a) => a.checked === false)).toBe(true);
+    expect(appState.day.anchors.map((a) => a.time)).toEqual(['08:00', '12:30', '19:00', '22:30']);
+    expect(appState.day.anchors.every((a) => a.checked === false)).toBe(true);
   });
 
   it('embeds the apagado checklist with copy-gate hints from es.js', () => {
-    const apagado = state.day.anchors.find((a) => a.id === 'apagado');
+    const apagado = appState.day.anchors.find((a) => a.id === 'apagado');
     expect(apagado.apagadoChecklist).toHaveLength(6);
     expect(apagado.apagadoChecklist.map((i) => i.id)).toEqual([
       'apagado-1',
@@ -130,47 +130,47 @@ describe('fresh store shape (design contract)', () => {
   });
 
   it('builds 3 blocks labeled from es.js with empty task lists', () => {
-    expect(state.day.blocks.map((b) => b.id)).toEqual(['manana', 'mediodia', 'tarde']);
-    expect(state.day.blocks.map((b) => b.label)).toEqual([
+    expect(appState.day.blocks.map((b) => b.id)).toEqual(['manana', 'mediodia', 'tarde']);
+    expect(appState.day.blocks.map((b) => b.label)).toEqual([
       copy.day.blocks.manana,
       copy.day.blocks.mediodia,
       copy.day.blocks.tarde,
     ]);
-    expect(state.day.blocks.every((b) => b.tasks.length === 0)).toBe(true);
+    expect(appState.day.blocks.every((b) => b.tasks.length === 0)).toBe(true);
   });
 });
 
 describe('actions — view and disclaimer', () => {
   it('acknowledges the disclaimer', () => {
     actions.acknowledgeDisclaimer();
-    expect(state.disclaimerAccepted).toBe(true);
+    expect(appState.disclaimerAccepted).toBe(true);
   });
 
   it('switches views only within the allowed set', () => {
     expect(actions.setView('week')).toBe(true);
-    expect(state.view).toBe('week');
+    expect(appState.view).toBe('week');
     expect(actions.setView('bogus')).toBe(false);
-    expect(state.view).toBe('week');
+    expect(appState.view).toBe('week');
     actions.setView('day');
   });
 });
 
 describe('actions — anchors (recovery wiring)', () => {
   it('toggles only the target anchor, leaving the others untouched', () => {
-    const before = state.day.anchors;
+    const before = appState.day.anchors;
     actions.setAnchorChecked('despertar', true);
-    expect(state.day.anchors[0].checked).toBe(true);
-    expect(state.day.anchors[0]).not.toBe(before[0]); // changed copy
-    expect(state.day.anchors[1]).toBe(before[1]); // identity preserved
-    expect(state.day.anchors[2]).toBe(before[2]);
-    expect(state.day.anchors[3]).toBe(before[3]);
+    expect(appState.day.anchors[0].checked).toBe(true);
+    expect(appState.day.anchors[0]).not.toBe(before[0]); // changed copy
+    expect(appState.day.anchors[1]).toBe(before[1]); // identity preserved
+    expect(appState.day.anchors[2]).toBe(before[2]);
+    expect(appState.day.anchors[3]).toBe(before[3]);
     expect(before[0].checked).toBe(false); // original not mutated
     actions.setAnchorChecked('despertar', false);
   });
 
   it('toggles one apagado checklist item at a time', () => {
     actions.toggleApagadoItem('apagado-2');
-    const apagado = state.day.anchors.find((a) => a.id === 'apagado');
+    const apagado = appState.day.anchors.find((a) => a.id === 'apagado');
     expect(apagado.apagadoChecklist[1].checked).toBe(true);
     expect(apagado.apagadoChecklist.filter((i) => i.checked).length).toBe(1);
     actions.toggleApagadoItem('apagado-2');
@@ -179,8 +179,8 @@ describe('actions — anchors (recovery wiring)', () => {
 
   it('applies an anchor time to the day and to settings immediately', () => {
     expect(actions.setAnchorTime('movimiento', '18:30')).toBe(true);
-    expect(state.day.anchors.find((a) => a.id === 'movimiento').time).toBe('18:30');
-    expect(state.settings.anchorTimes.movimiento).toBe('18:30');
+    expect(appState.day.anchors.find((a) => a.id === 'movimiento').time).toBe('18:30');
+    expect(appState.settings.anchorTimes.movimiento).toBe('18:30');
     expect(actions.setAnchorTime('movimiento', 'sin-hora')).toBe(false);
     actions.setAnchorTime('movimiento', '19:00');
   });
@@ -201,26 +201,26 @@ describe('actions — blocks', () => {
     expect(actions.addTask('manana', 'Revisar correo')).toBe(true);
     expect(actions.addTask('manana', '   ')).toBe(false);
     expect(actions.addTask('nope', 'Tarea')).toBe(false);
-    const manana = state.day.blocks.find((b) => b.id === 'manana');
+    const manana = appState.day.blocks.find((b) => b.id === 'manana');
     expect(manana.tasks).toHaveLength(1);
     assertKeys(manana.tasks[0], TASK_KEYS);
   });
 
   it('swaps block order without detaching tasks and syncs settings', () => {
-    const manana = state.day.blocks.find((b) => b.id === 'manana');
+    const manana = appState.day.blocks.find((b) => b.id === 'manana');
     const taskBefore = manana.tasks[0];
     expect(actions.swapBlocks('manana', 'tarde')).toBe(true);
-    expect(state.day.blocks.map((b) => b.id)).toEqual(['tarde', 'mediodia', 'manana']);
-    expect(state.settings.blockOrder).toEqual(['tarde', 'mediodia', 'manana']);
-    const mananaAfter = state.day.blocks.find((b) => b.id === 'manana');
+    expect(appState.day.blocks.map((b) => b.id)).toEqual(['tarde', 'mediodia', 'manana']);
+    expect(appState.settings.blockOrder).toEqual(['tarde', 'mediodia', 'manana']);
+    const mananaAfter = appState.day.blocks.find((b) => b.id === 'manana');
     expect(mananaAfter.tasks[0]).toBe(taskBefore); // task kept its block
     actions.swapBlocks('manana', 'tarde');
-    expect(state.day.blocks.map((b) => b.id)).toEqual(['manana', 'mediodia', 'tarde']);
-    expect(state.settings.blockOrder).toEqual(['manana', 'mediodia', 'tarde']);
+    expect(appState.day.blocks.map((b) => b.id)).toEqual(['manana', 'mediodia', 'tarde']);
+    expect(appState.settings.blockOrder).toEqual(['manana', 'mediodia', 'tarde']);
   });
 
   it('marks a task done or not wherever it lives', () => {
-    const manana = state.day.blocks.find((b) => b.id === 'manana');
+    const manana = appState.day.blocks.find((b) => b.id === 'manana');
     const task = manana.tasks[0];
     expect(actions.setTaskDone(task.id, true)).toBe(true);
     expect(manana.tasks[0].done).toBe(true);
@@ -232,64 +232,64 @@ describe('actions — blocks', () => {
 
 describe('actions — quick capture', () => {
   it('keeps unassigned captures in the day view', () => {
-    const before = state.day.captured.length;
+    const before = appState.day.captured.length;
     expect(actions.capture('Sacar turno')).toBe(true);
-    expect(state.day.captured).toHaveLength(before + 1);
-    expect(state.day.captured.at(-1).title).toBe('Sacar turno');
-    assertKeys(state.day.captured.at(-1), TASK_KEYS);
+    expect(appState.day.captured).toHaveLength(before + 1);
+    expect(appState.day.captured.at(-1).title).toBe('Sacar turno');
+    assertKeys(appState.day.captured.at(-1), TASK_KEYS);
   });
 
   it('places assigned captures in the given block', () => {
-    const beforeBlock = state.day.blocks.find((b) => b.id === 'mediodia').tasks.length;
-    const beforeCaptured = state.day.captured.length;
+    const beforeBlock = appState.day.blocks.find((b) => b.id === 'mediodia').tasks.length;
+    const beforeCaptured = appState.day.captured.length;
     expect(actions.capture('Enfoque profundo', 'mediodia')).toBe(true);
-    expect(state.day.blocks.find((b) => b.id === 'mediodia').tasks).toHaveLength(beforeBlock + 1);
-    expect(state.day.captured).toHaveLength(beforeCaptured); // unchanged
+    expect(appState.day.blocks.find((b) => b.id === 'mediodia').tasks).toHaveLength(beforeBlock + 1);
+    expect(appState.day.captured).toHaveLength(beforeCaptured); // unchanged
   });
 });
 
 describe('actions — week ritual', () => {
   it('stores the two review answers', () => {
     actions.setReviewAnswers(['La rutina de la mañana', 'Más movimiento']);
-    expect(state.week.reviewAnswers).toEqual(['La rutina de la mañana', 'Más movimiento']);
+    expect(appState.week.reviewAnswers).toEqual(['La rutina de la mañana', 'Más movimiento']);
   });
 
   it('caps priorities at 3 and removes them', () => {
     expect(actions.addPriority('Preparar la charla')).toBe(true);
     expect(actions.addPriority('Llamar al dentista')).toBe(true);
     expect(actions.addPriority('Ordenar el escritorio')).toBe(true);
-    expect(state.week.priorities).toHaveLength(3);
+    expect(appState.week.priorities).toHaveLength(3);
     expect(actions.addPriority('Cuarta prioridad')).toBe(false);
-    const firstId = state.week.priorities[0].id;
+    const firstId = appState.week.priorities[0].id;
     actions.removePriority(firstId);
-    expect(state.week.priorities).toHaveLength(2);
+    expect(appState.week.priorities).toHaveLength(2);
   });
 
   it('promotes an existing task to a priority without duplicating', () => {
-    const block = state.day.blocks.find((b) => b.id === 'manana');
+    const block = appState.day.blocks.find((b) => b.id === 'manana');
     const task = block.tasks[0];
     expect(actions.addPriorityTask(task.id)).toBe(true);
-    expect(state.week.priorities.at(-1).title).toBe(task.title);
+    expect(appState.week.priorities.at(-1).title).toBe(task.title);
     expect(actions.addPriorityTask(task.id)).toBe(false); // already a priority
   });
 
   it('advances the ritual through 4 steps and never past them', () => {
     actions.setRitualStep(2);
     actions.advanceRitualStep();
-    expect(state.week.ritualStep).toBe(3);
+    expect(appState.week.ritualStep).toBe(3);
     actions.setRitualStep(4);
     actions.advanceRitualStep();
-    expect(state.week.ritualStep).toBe(4); // 4th step closes the ritual
+    expect(appState.week.ritualStep).toBe(4); // 4th step closes the ritual
     actions.setRitualStep(9);
-    expect(state.week.ritualStep).toBe(4);
+    expect(appState.week.ritualStep).toBe(4);
     actions.setRitualStep(0);
-    expect(state.week.ritualStep).toBe(1);
+    expect(appState.week.ritualStep).toBe(1);
   });
 
   it('records a priority in the weekly schedule', () => {
-    const priority = state.week.priorities[0];
+    const priority = appState.week.priorities[0];
     expect(actions.schedulePriority(priority.id, '2026-09-19', 'manana')).toBe(true);
-    expect(state.week.schedule.at(-1)).toEqual({
+    expect(appState.week.schedule.at(-1)).toEqual({
       priorityId: priority.id,
       day: '2026-09-19',
       blockId: 'manana',
@@ -301,29 +301,29 @@ describe('actions — week ritual', () => {
 describe('actions — settings sync to the day view', () => {
   it('updates the default timer and clamps it', () => {
     expect(actions.updateSettings({ defaultTimerMin: 45 })).toBe(true);
-    expect(state.settings.defaultTimerMin).toBe(45);
+    expect(appState.settings.defaultTimerMin).toBe(45);
     actions.updateSettings({ defaultTimerMin: 9999 });
-    expect(state.settings.defaultTimerMin).toBe(120);
+    expect(appState.settings.defaultTimerMin).toBe(120);
     actions.updateSettings({ defaultTimerMin: 0 });
-    expect(state.settings.defaultTimerMin).toBe(1);
+    expect(appState.settings.defaultTimerMin).toBe(1);
     actions.updateSettings({ defaultTimerMin: 25 });
   });
 
   it('applies block order and block times to the day immediately', () => {
     expect(actions.setBlockOrder(['tarde', 'manana', 'mediodia'])).toBe(true);
-    expect(state.day.blocks.map((b) => b.id)).toEqual(['tarde', 'manana', 'mediodia']);
+    expect(appState.day.blocks.map((b) => b.id)).toEqual(['tarde', 'manana', 'mediodia']);
     expect(actions.setBlockOrder(['tarde', 'manana'])).toBe(false);
     actions.setBlockOrder(['manana', 'mediodia', 'tarde']);
 
     actions.updateSettings({ blockTimes: { manana: '08:30' } });
-    expect(state.day.blocks.find((b) => b.id === 'manana').time).toBe('08:30');
-    expect(state.settings.blockTimes.manana).toBe('08:30');
+    expect(appState.day.blocks.find((b) => b.id === 'manana').time).toBe('08:30');
+    expect(appState.settings.blockTimes.manana).toBe('08:30');
     actions.updateSettings({ blockTimes: { manana: '09:00' } });
   });
 
   it('updates the wake time', () => {
     expect(actions.setWakeTime('06:30')).toBe(true);
-    expect(state.settings.wakeTime).toBe('06:30');
+    expect(appState.settings.wakeTime).toBe('06:30');
     expect(actions.setWakeTime('no')).toBe(false);
     actions.setWakeTime('07:00');
   });
@@ -331,7 +331,7 @@ describe('actions — settings sync to the day view', () => {
 
 describe('actions — timer (slice-1 Timer interface)', () => {
   it('starts a countdown and ticks to zero under fake time', () => {
-    const task = state.day.blocks.find((b) => b.id === 'manana').tasks[0];
+    const task = appState.day.blocks.find((b) => b.id === 'manana').tasks[0];
     expect(actions.startFocus(task.id)).toBe(true);
     expect(focus.currentTask).toEqual({
       taskId: task.id,
@@ -354,7 +354,7 @@ describe('actions — timer (slice-1 Timer interface)', () => {
     vi.setSystemTime(new Date(t0.getTime() + 61_000));
     expect(actions.timerTick()).toBe(0);
     expect(focus.timerState).toBe('done');
-    expect(state.day.blocks.find((b) => b.id === 'manana').tasks[0].done).toBe(true);
+    expect(appState.day.blocks.find((b) => b.id === 'manana').tasks[0].done).toBe(true);
     expect(focus.reward).toEqual({ taskId: task.id, title: task.title });
     vi.useRealTimers();
   });
@@ -386,7 +386,7 @@ describe('actions — export / import roundtrip', () => {
     expect(actions.importJson('not json')).toBe(false);
     expect(actions.importJson(JSON.stringify({ version: 2 }))).toBe(false);
     expect(actions.importJson(JSON.stringify({ version: 1, day: null }))).toBe(true);
-    expect(state.day).not.toBeNull(); // defaults fill the null key
+    expect(appState.day).not.toBeNull(); // defaults fill the null key
   });
 });
 
@@ -410,11 +410,11 @@ describe('D6 — dateKey is display-only, nothing auto-resets', () => {
     const fresh = await reloadStore();
     vi.useRealTimers();
 
-    expect(fresh.state.day.dateKey).toBe('2026-09-01'); // restored, not regenerated
-    expect(fresh.state.day.anchors.find((a) => a.id === 'despertar').checked).toBe(true);
-    expect(fresh.state.day.anchors.every((a) => a.checked === false)).toBe(false);
-    expect(fresh.state.view).toBe('week');
-    expect(fresh.state.disclaimerAccepted).toBe(true);
-    assertFullShape(fresh.state);
+    expect(fresh.appState.day.dateKey).toBe('2026-09-01'); // restored, not regenerated
+    expect(fresh.appState.day.anchors.find((a) => a.id === 'despertar').checked).toBe(true);
+    expect(fresh.appState.day.anchors.every((a) => a.checked === false)).toBe(false);
+    expect(fresh.appState.view).toBe('week');
+    expect(fresh.appState.disclaimerAccepted).toBe(true);
+    assertFullShape(fresh.appState);
   });
 });

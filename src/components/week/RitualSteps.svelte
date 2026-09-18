@@ -3,17 +3,17 @@
   // render in sequence; ritualStep, answers, priorities and schedule live
   // in the persisted week state, so an interrupted ritual resumes exactly
   // where it stopped (no progress is local-only).
-  import { state, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import PrioritiesPicker from './PrioritiesPicker.svelte';
 
-  const step = $derived(state.week.ritualStep);
+  const step = $derived(appState.week.ritualStep);
   const stepDef = $derived(copy.week.steps[step - 1]);
-  const scheduledIds = $derived(new Set(state.week.schedule.map((s) => s.priorityId)));
+  const scheduledIds = $derived(new Set(appState.week.schedule.map((s) => s.priorityId)));
 
   // The two review questions stay local until "Siguiente" persists them.
-  let q1 = $state(state.week.reviewAnswers[0] ?? '');
-  let q2 = $state(state.week.reviewAnswers[1] ?? '');
+  let q1 = $state(appState.week.reviewAnswers[0] ?? '');
+  let q2 = $state(appState.week.reviewAnswers[1] ?? '');
 
   // Per-priority scheduling draft (day label + block id), defaulted to the
   // first day and block. Values are read reactively; the row() helper only
@@ -22,7 +22,7 @@
 
   function row(id) {
     if (!draft[id]) {
-      draft[id] = { day: copy.week.days[0], blockId: state.day.blocks[0]?.id ?? '' };
+      draft[id] = { day: copy.week.days[0], blockId: appState.day.blocks[0]?.id ?? '' };
     }
     return draft[id];
   }
@@ -63,11 +63,11 @@
     <PrioritiesPicker />
   {:else if step === 3}
     <p class="hint">{stepDef.hint}</p>
-    {#if state.week.priorities.length === 0}
+    {#if appState.week.priorities.length === 0}
       <p class="empty">{copy.week.noPriorities}</p>
     {:else}
       <ul class="schedule-list">
-        {#each state.week.priorities as priority (priority.id)}
+        {#each appState.week.priorities as priority (priority.id)}
           <li class="schedule-row">
             <span class="p-title">{priority.title}</span>
             {#if scheduledIds.has(priority.id)}
@@ -84,10 +84,10 @@
             </select>
             <select
               aria-label={copy.week.scheduleBlock}
-              value={draft[priority.id]?.blockId ?? state.day.blocks[0]?.id ?? ''}
+              value={draft[priority.id]?.blockId ?? appState.day.blocks[0]?.id ?? ''}
               onchange={(e) => (row(priority.id).blockId = e.currentTarget.value)}
             >
-              {#each state.day.blocks as block (block.id)}
+              {#each appState.day.blocks as block (block.id)}
                 <option value={block.id}>{block.label}</option>
               {/each}
             </select>

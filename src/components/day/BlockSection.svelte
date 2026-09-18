@@ -3,14 +3,14 @@
   // reorder control: the block object moves wholesale through swapBlocks,
   // so its tasks always stay attached (spec: Swappable blocks / swap keeps
   // tasks). New tasks are added through the store action.
-  import { state, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import TaskCard from './TaskCard.svelte';
 
   let { block, index } = $props();
   let newTitle = $state('');
 
-  const blocks = $derived(state.day.blocks);
+  const blocks = $derived(appState.day.blocks);
 
   function addTask() {
     if (!newTitle.trim()) return;
@@ -39,7 +39,7 @@
         value={block.time}
         onchange={(e) =>
           actions.updateSettings({
-            blockTimes: { ...state.settings.blockTimes, [block.id]: e.currentTarget.value },
+            blockTimes: { ...appState.settings.blockTimes, [block.id]: e.currentTarget.value },
           })}
         aria-label={copy.day.anchorTimeLabel}
       />

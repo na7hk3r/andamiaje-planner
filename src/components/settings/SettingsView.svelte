@@ -3,7 +3,7 @@
   // immediately through the store and persists; nothing needs a save step.
   // Wake time, anchor times, block times, block order, default timer, and
   // the export / import roundtrip live here.
-  import { state, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
 
   let importError = $state(false);
@@ -32,12 +32,12 @@
 
   function setBlockTime(id, value) {
     actions.updateSettings({
-      blockTimes: { ...state.settings.blockTimes, [id]: value },
+      blockTimes: { ...appState.settings.blockTimes, [id]: value },
     });
   }
 
   function moveBlock(index, direction) {
-    const order = state.day.blocks;
+    const order = appState.day.blocks;
     if (!order[index + direction]) return;
     if (direction < 0) actions.swapBlocks(order[index + direction].id, order[index].id);
     else actions.swapBlocks(order[index].id, order[index + direction].id);
@@ -51,7 +51,7 @@
     <h3>{copy.settings.wakeTime}</h3>
     <input
       type="time"
-      value={state.settings.wakeTime}
+      value={appState.settings.wakeTime}
       onchange={(e) => actions.setWakeTime(e.currentTarget.value)}
       aria-label={copy.settings.wakeTime}
     />
@@ -60,12 +60,12 @@
   <section>
     <h3>{copy.settings.anchorTimes}</h3>
     <ul class="rows">
-      {#each state.day.anchors as anchor (anchor.id)}
+      {#each appState.day.anchors as anchor (anchor.id)}
         <li>
           <span>{copy.day.anchors[anchor.id]}</span>
           <input
             type="time"
-            value={state.settings.anchorTimes[anchor.id]}
+            value={appState.settings.anchorTimes[anchor.id]}
             onchange={(e) => actions.setAnchorTime(anchor.id, e.currentTarget.value)}
             aria-label={copy.day.anchors[anchor.id]}
           />
@@ -77,12 +77,12 @@
   <section>
     <h3>{copy.settings.blockTimes}</h3>
     <ul class="rows">
-      {#each state.day.blocks as block (block.id)}
+      {#each appState.day.blocks as block (block.id)}
         <li>
           <span>{copy.day.blocks[block.id]}</span>
           <input
             type="time"
-            value={state.settings.blockTimes[block.id]}
+            value={appState.settings.blockTimes[block.id]}
             onchange={(e) => setBlockTime(block.id, e.currentTarget.value)}
             aria-label={copy.day.blocks[block.id]}
           />
@@ -94,7 +94,7 @@
   <section>
     <h3>{copy.settings.blockOrder}</h3>
     <ul class="rows">
-      {#each state.day.blocks as block, i (block.id)}
+      {#each appState.day.blocks as block, i (block.id)}
         <li>
           <span>{copy.day.blocks[block.id]}</span>
           <div class="order-controls">
@@ -110,7 +110,7 @@
             <button
               class="ghost small"
               type="button"
-              disabled={i === state.day.blocks.length - 1}
+              disabled={i === appState.day.blocks.length - 1}
               onclick={() => moveBlock(i, 1)}
               aria-label={copy.common.moveDown}
             >
@@ -129,7 +129,7 @@
         type="number"
         min="1"
         max="120"
-        value={state.settings.defaultTimerMin}
+        value={appState.settings.defaultTimerMin}
         onchange={(e) => actions.updateSettings({ defaultTimerMin: Number(e.currentTarget.value) })}
         aria-label={copy.settings.defaultTimer}
       />

@@ -4,7 +4,7 @@
   // todo wall). Stages: picker -> one task + primer paso + countdown ->
   // reward -> next/back. Timer math runs through the delta-based timer API;
   // this component only drives ticks and renders store state.
-  import { state, focus, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, focus, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import PrimerPasoHelper from './PrimerPasoHelper.svelte';
   import Countdown from './Countdown.svelte';
@@ -15,15 +15,15 @@
 
   const pending = $derived.by(() => {
     const list = [];
-    for (const block of state.day.blocks) {
+    for (const block of appState.day.blocks) {
       for (const task of block.tasks) {
         if (!task.done) list.push({ taskId: task.id, title: task.title });
       }
     }
-    for (const task of state.day.captured) {
+    for (const task of appState.day.captured) {
       if (!task.done) list.push({ taskId: task.id, title: task.title });
     }
-    for (const task of state.week.priorities) {
+    for (const task of appState.week.priorities) {
       if (!task.done) list.push({ taskId: task.id, title: task.title });
     }
     return list;

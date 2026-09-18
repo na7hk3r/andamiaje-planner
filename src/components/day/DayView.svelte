@@ -3,7 +3,7 @@
   // independent anchors (apagado embeds its checklist), the three swappable
   // blocks, and the unassigned captures. A banner points at the next
   // actionable anchor — recovery copy, never a restart offer.
-  import { state, actions } from '../../lib/store/app-state.svelte.js';
+  import { appState, actions } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import AnchorCard from './AnchorCard.svelte';
   import BlockSection from './BlockSection.svelte';
@@ -28,7 +28,7 @@
   <section aria-label={copy.day.anchorsTitle}>
     <h3>{copy.day.anchorsTitle}</h3>
     <div class="anchor-list">
-      {#each state.day.anchors as anchor (anchor.id)}
+      {#each appState.day.anchors as anchor (anchor.id)}
         <AnchorCard {anchor} />
       {/each}
     </div>
@@ -40,18 +40,18 @@
       {copy.day.swapBlocks} · {copy.day.swapKeepsTasks}
     </p>
     <div class="block-list">
-      {#each state.day.blocks as block, i (block.id)}
+      {#each appState.day.blocks as block, i (block.id)}
         <BlockSection {block} index={i} />
       {/each}
     </div>
   </section>
 
-  {#if state.day.captured.length > 0}
+  {#if appState.day.captured.length > 0}
     <section aria-label={copy.day.unassigned}>
       <h3>{copy.day.unassigned}</h3>
       <p class="hint">{copy.recovery.progressCounts}</p>
       <ul class="captured-list">
-        {#each state.day.captured as task (task.id)}
+        {#each appState.day.captured as task (task.id)}
           <li><TaskCard {task} /></li>
         {/each}
       </ul>

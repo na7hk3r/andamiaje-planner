@@ -3,11 +3,11 @@
   // resume banner when the ritual was interrupted mid-way, and nudges a
   // fixed weekly slot. All ritual progress is persisted, so returning to
   // this view continues exactly where it stopped.
-  import { state } from '../../lib/store/app-state.svelte.js';
+  import { appState } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import RitualSteps from './RitualSteps.svelte';
 
-  const resumed = $derived(state.week.ritualStep > 1);
+  const resumed = $derived(appState.week.ritualStep > 1);
 </script>
 
 <div class="week-view">
