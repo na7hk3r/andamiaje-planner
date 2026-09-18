@@ -88,4 +88,47 @@ describe('createTimer', () => {
     expect(timer.state).toBe('idle');
     expect(timer.remaining()).toBe(0);
   });
+
+  it('pauses and freezes the remaining time, then resumes a fresh run of it', () => {
+    const timer = createTimer();
+    timer.start(60_000);
+    vi.advanceTimersByTime(25_000);
+    expect(timer.pause()).toBe(35_000);
+    expect(timer.state).toBe('paused');
+    expect(timer.remaining()).toBe(35_000);
+    vi.advanceTimersByTime(60_000); // wall clock keeps moving while paused
+    expect(timer.remaining()).toBe(35_000);
+    expect(timer.resume()).toBe(35_000);
+    expect(timer.state).toBe('running');
+    vi.advanceTimersByTime(20_000);
+    expect(timer.remaining()).toBe(15_000);
+  });
+
+  it('completes rather than pauses when the remaining time is already zero', () => {
+    const timer = createTimer();
+    timer.start(10_000);
+    vi.advanceTimersByTime(10_000);
+    expect(timer.pause()).toBe(0);
+    expect(timer.state).toBe('done');
+  });
+
+  it('ignores pause while idle and resume while running', () => {
+    const timer = createTimer();
+    expect(timer.state).toBe('idle');
+    expect(timer.pause()).toBe(0);
+    expect(timer.state).toBe('idle');
+    timer.start(30_000);
+    expect(timer.resume()).toBe(30_000);
+    expect(timer.state).toBe('running');
+  });
+
+  it('clears a paused run on reset', () => {
+    const timer = createTimer();
+    timer.start(60_000);
+    timer.pause();
+    expect(timer.state).toBe('paused');
+    timer.reset();
+    expect(timer.state).toBe('idle');
+    expect(timer.remaining()).toBe(0);
+  });
 });

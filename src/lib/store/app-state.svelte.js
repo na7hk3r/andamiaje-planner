@@ -482,6 +482,38 @@ export const actions = {
     focus.currentTask = null;
   },
 
+  // Pause freezes the remaining time (pure timer state -> PAUSED); nothing
+  // is lost or restarted, so the timer never behaves like a reset. The
+  // frozen remainder is what the resume action continues from.
+  pauseTimer() {
+    if (focus.timerState !== TIMER_STATES.RUNNING) return false;
+    focus.timerRemainingMs = timer.pause();
+    focus.timerState = timer.state;
+    return true;
+  },
+
+  // Resume restarts the countdown over exactly the frozen remaining time.
+  resumeTimer() {
+    if (focus.timerState !== TIMER_STATES.PAUSED) return false;
+    focus.timerRemainingMs = timer.resume();
+    focus.timerState = timer.state;
+    return true;
+  },
+
+  // Completing a tramo early ("Completar tramo") reaches the same end
+  // condition as the natural countdown finish: the focused task is marked
+  // done once and the calm reward reference is set. Guarded against repeat
+  // calls once a reward already exists, so a double click cannot double-count.
+  completeFocusTramo() {
+    if (!focus.currentTask || focus.reward) return false;
+    completeCurrentTask();
+    timer.reset();
+    focus.timerState = TIMER_STATES.IDLE;
+    focus.timerDurationMs = 0;
+    focus.timerRemainingMs = 0;
+    return true;
+  },
+
   timerPresets() {
     return TIMER_PRESETS_MIN;
   },

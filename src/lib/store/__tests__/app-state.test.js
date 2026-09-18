@@ -392,6 +392,69 @@ describe('actions — timer (slice-1 Timer interface)', () => {
   it('exposes the standard presets', () => {
     expect(actions.timerPresets()).toEqual([20, 30, 45]);
   });
+
+  it('pauses and resumes keeping the remaining time, without touching task flags', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'mediodia');
+    const task = block.tasks[0];
+    actions.startFocus(task.id);
+    vi.useFakeTimers();
+    const t0 = new Date(2026, 8, 18, 10, 0);
+    vi.setSystemTime(t0);
+    actions.startTimer(60_000);
+    vi.setSystemTime(new Date(t0.getTime() + 15_000));
+    expect(actions.timerTick()).toBe(45_000);
+
+    expect(actions.pauseTimer()).toBe(true);
+    expect(focus.timerState).toBe('paused');
+    expect(focus.timerRemainingMs).toBe(45_000);
+
+    // Wall clock keeps moving while paused: the remainder stays frozen.
+    vi.setSystemTime(new Date(t0.getTime() + 40_000));
+    expect(actions.timerTick()).toBe(45_000);
+    expect(focus.timerState).toBe('paused');
+
+    vi.setSystemTime(new Date(t0.getTime() + 41_000));
+    expect(actions.resumeTimer()).toBe(true);
+    expect(focus.timerState).toBe('running');
+    expect(focus.timerRemainingMs).toBe(45_000);
+
+    vi.setSystemTime(new Date(t0.getTime() + 51_000));
+    expect(actions.timerTick()).toBe(35_000);
+    expect(task.done).toBe(false); // pause/resume never marks anything done
+    vi.useRealTimers();
+    actions.timerReset();
+  });
+
+  it('rejects pause while idle and resume while running', () => {
+    actions.timerReset();
+    expect(actions.pauseTimer()).toBe(false); // idle: nothing to pause
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 18, 10, 0));
+    actions.startTimer(30_000);
+    expect(actions.resumeTimer()).toBe(false); // already running
+    expect(focus.timerState).toBe('running');
+    vi.useRealTimers();
+    actions.timerReset();
+  });
+
+  it('completes the tramo early: task done once, reward shown, timer idle', () => {
+    const block = appState.day.blocks.find((b) => b.id === 'mediodia');
+    const task = block.tasks[0];
+    actions.startFocus(task.id);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 8, 18, 10, 0));
+    actions.startTimer(30 * 60_000);
+    vi.setSystemTime(new Date(2026, 8, 18, 10, 12));
+    actions.timerTick();
+    expect(actions.completeFocusTramo()).toBe(true);
+    expect(task.done).toBe(true);
+    expect(focus.reward).toEqual({ taskId: task.id, title: task.title });
+    expect(focus.timerState).toBe('idle');
+    expect(focus.timerRemainingMs).toBe(0);
+    expect(focus.timerDurationMs).toBe(0);
+    expect(actions.completeFocusTramo()).toBe(false); // reward already set
+    vi.useRealTimers();
+  });
 });
 
 describe('actions — start focus from a task (Day view bridge)', () => {

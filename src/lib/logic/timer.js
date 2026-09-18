@@ -8,6 +8,7 @@ export const TIMER_PRESETS_MIN = [20, 30, 45];
 export const TIMER_STATES = Object.freeze({
   IDLE: 'idle',
   RUNNING: 'running',
+  PAUSED: 'paused',
   DONE: 'done',
 });
 
@@ -28,13 +29,48 @@ export function createTimer(now = () => Date.now()) {
   let state = TIMER_STATES.IDLE;
   let durationMs = 0;
   let startAt = 0;
+  let pausedRemainingMs = 0;
 
   function remaining(at = now()) {
     if (state === TIMER_STATES.DONE) return 0;
+    if (state === TIMER_STATES.PAUSED) return pausedRemainingMs;
     if (state !== TIMER_STATES.RUNNING) return durationMs;
     const elapsed = Math.max(0, at - startAt);
     const rem = Math.max(0, durationMs - elapsed);
     if (rem === 0) state = TIMER_STATES.DONE;
+    return rem;
+  }
+
+  function startCountdown(duration, at) {
+    const safeDuration = Math.max(0, duration);
+    durationMs = safeDuration;
+    startAt = at;
+    pausedRemainingMs = 0;
+    state = TIMER_STATES.RUNNING;
+    return remaining(at);
+  }
+
+  // Freezes the countdown at its current remaining time (state -> PAUSED).
+  // A pause is NOT a reset: the frozen remainder survives until resume and
+  // the wall clock moving meanwhile never erodes it. When the remaining
+  // time is already zero the run completes instead — a pause at 00:00 must
+  // not resurrect an expired timer.
+  function pause(at = now()) {
+    if (state !== TIMER_STATES.RUNNING) return remaining(at);
+    const rem = remaining(at);
+    if (state === TIMER_STATES.DONE) return 0;
+    pausedRemainingMs = rem;
+    state = TIMER_STATES.PAUSED;
+    return rem;
+  }
+
+  // Resumes by restarting the countdown over exactly the frozen remaining
+  // time: delta math stays drift-immune because the elapsed clock restarts
+  // at the resume instant, and the run only ever counts what is left.
+  function resume(at = now()) {
+    if (state !== TIMER_STATES.PAUSED) return remaining(at);
+    const rem = pausedRemainingMs;
+    startCountdown(rem, at);
     return rem;
   }
 
@@ -47,18 +83,17 @@ export function createTimer(now = () => Date.now()) {
     },
     presets: TIMER_PRESETS_MIN,
     start(duration, at = now()) {
-      const safeDuration = Math.max(0, duration);
-      durationMs = safeDuration;
-      startAt = at;
-      state = TIMER_STATES.RUNNING;
-      return remaining(at);
+      return startCountdown(duration, at);
     },
     remaining,
+    pause,
+    resume,
     format: formatDuration,
     reset() {
       state = TIMER_STATES.IDLE;
       durationMs = 0;
       startAt = 0;
+      pausedRemainingMs = 0;
     },
   };
 }
