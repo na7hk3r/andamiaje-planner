@@ -8,6 +8,7 @@
   import { onMount } from 'svelte';
   import { appState, actions, VIEWS } from './lib/store/app-state.svelte.js';
   import { copy } from './lib/i18n-copy/es.js';
+  import { openCapture } from './lib/store/capture.svelte.js';
   import Footer from './components/layout/Footer.svelte';
   import TopNav from './components/layout/TopNav.svelte';
   import QuickCapture from './components/layout/QuickCapture.svelte';
@@ -40,7 +41,23 @@
     const view = parseHash();
     if (view && view !== appState.view) actions.setView(view);
     window.addEventListener('hashchange', applyHash);
-    return () => window.removeEventListener('hashchange', applyHash);
+
+    // Global quick capture shortcut: Ctrl+K (or Cmd+K on macOS). The modal
+    // only lives behind the disclaimer gate, so the shortcut stays silent
+    // until the first-run acknowledgment.
+    function onKeydown(event) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        if (!appState.disclaimerAccepted) return;
+        event.preventDefault();
+        openCapture();
+      }
+    }
+    window.addEventListener('keydown', onKeydown);
+
+    return () => {
+      window.removeEventListener('hashchange', applyHash);
+      window.removeEventListener('keydown', onKeydown);
+    };
   });
 
   function navigate(view) {
@@ -94,6 +111,7 @@
     </nav>
     <Footer />
   </main>
+  <QuickCapture />
 {/if}
 
 <style>

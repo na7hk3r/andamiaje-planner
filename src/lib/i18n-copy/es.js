@@ -161,6 +161,13 @@ export const copy = {
     placeholder: '¿Qué tienes en mente?',
     assignToBlock: 'Asignar a un bloque',
     unassigned: 'Sin asignar',
+    modalTitle: 'Captura rápida · Vaciar la mente',
+    modalHint:
+      'Anota lo que te distrae o lo que quieres hacer más tarde para no guardarlo en tu memoria de trabajo.',
+    modalPlaceholder: 'Ej. Enviar la factura pendiente…',
+    closeLabel: 'Cerrar modal (Esc)',
+    saveLabel: 'Guardar en el andamio',
+    kbdHint: '[Esc] para cerrar · [Enter] para guardar',
   },
 
   settings: {
