@@ -9,11 +9,21 @@
   import { appState, actions, VIEWS } from './lib/store/app-state.svelte.js';
   import { copy } from './lib/i18n-copy/es.js';
   import Footer from './components/layout/Footer.svelte';
+  import TopNav from './components/layout/TopNav.svelte';
   import QuickCapture from './components/layout/QuickCapture.svelte';
   import DayView from './components/day/DayView.svelte';
   import FocusView from './components/focus/FocusView.svelte';
   import WeekView from './components/week/WeekView.svelte';
   import SettingsView from './components/settings/SettingsView.svelte';
+
+  // Material Symbols glyph per view for the mobile bottom nav. Keys mirror
+  // the VIEWS ids so the loop stays data-driven.
+  const NAV_ICONS = {
+    day: 'calendar_today',
+    focus: 'timer',
+    week: 'view_week',
+    settings: 'settings',
+  };
 
   function parseHash() {
     const value =
@@ -53,8 +63,8 @@
     </section>
   </main>
 {:else}
-  <main class="shell">
-    <QuickCapture />
+  <main class="shell" id="top">
+    <TopNav onnavigate={navigate} />
     <div class="view">
       {#if appState.view === 'day'}
         <DayView />
@@ -72,9 +82,13 @@
           class="nav-item"
           class:active={appState.view === view}
           type="button"
+          aria-current={appState.view === view ? 'page' : undefined}
           onclick={() => navigate(view)}
         >
-          {copy.nav[view]}
+          <span class="material-symbols-outlined nav-icon" aria-hidden="true">
+            {NAV_ICONS[view]}
+          </span>
+          <span class="nav-label">{copy.nav[view]}</span>
         </button>
       {/each}
     </nav>
@@ -302,28 +316,53 @@
     padding-bottom: 1.5rem;
   }
 
+  /* Bottom navigation: mobile only (top pills live in TopNav from md up) */
   .nav {
     display: flex;
     justify-content: space-around;
-    gap: 0.4rem;
-    padding: 0.6rem 0.75rem;
-    border-top: 1px solid var(--border);
-    background: var(--card-bg);
+    align-items: stretch;
+    gap: var(--space-xs, 0.25rem);
+    padding: var(--space-xs, 0.25rem) var(--gutter-mobile, 1rem)
+      calc(var(--space-xs, 0.25rem) + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border, #dbe3eb);
+    background: var(--card-bg, #ffffff);
     position: sticky;
     bottom: 0;
+    z-index: 20;
+  }
+
+  @media (min-width: 48rem) {
+    .nav {
+      display: none;
+    }
   }
 
   .nav-item {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    min-height: 48px;
+    padding: 0.25rem 0.5rem;
     border: none;
+    border-radius: var(--radius-field, 12px);
     background: transparent;
-    color: var(--text-soft);
-    font-size: 0.9rem;
-    padding: 0.55rem 0.4rem;
+    color: var(--text-soft, #6b7280);
+    font-size: var(--font-size-label-sm, 12px);
+    line-height: var(--line-height-label-sm, 16px);
+    letter-spacing: var(--letter-spacing-label-sm, 0.02em);
+    font-weight: var(--font-weight-medium, 500);
+    transition: var(--transition-gentle, all 180ms ease-out);
   }
 
   .nav-item.active {
-    color: var(--accent);
-    font-weight: 600;
+    color: var(--accent, #4f6b8a);
+    background: var(--accent-soft, #eff4fa);
+  }
+
+  .nav-icon {
+    font-size: 24px;
   }
 </style>

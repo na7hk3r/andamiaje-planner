@@ -34,6 +34,15 @@ export const copy = {
     settings: 'Ajustes',
   },
 
+  topnav: {
+    navLabel: 'Navegación principal',
+    captureLabel: 'Abrir captura rápida (Ctrl+K)',
+    capturePlaceholder: 'Buscar o capturar…',
+    shortcut: 'Ctrl K',
+    privacyButton: 'Privacidad local activa',
+    tuneButton: 'Ajustes de visualización',
+  },
+
   day: {
     title: 'Tu día',
     anchorsTitle: 'Anclas',
@@ -180,5 +189,8 @@ export const copy = {
   footer: {
     disclaimer:
       'Organiza rutinas; no sustituye la evaluación de un profesional de la salud.',
+    linksLabel: 'Enlaces de pie de página',
+    privacyLink: 'Privacidad local',
+    accessibilityLink: 'Accesibilidad',
   },
 };
