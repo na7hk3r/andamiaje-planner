@@ -1,13 +1,17 @@
 <script>
   // Week view (spec: Week Ritual). Hosts the guided ritual, surfaces the
-  // resume banner when the ritual was interrupted mid-way, and nudges a
-  // fixed weekly slot. All ritual progress is persisted, so returning to
-  // this view continues exactly where it stopped.
+  // resume banner when the ritual was interrupted mid-way (steps 2–3), and
+  // nudges a fixed weekly slot. The banner hides once the ritual is
+  // completed (step 4) — "Retomar" copy would be misleading there. All
+  // ritual progress is persisted, so returning to this view continues
+  // exactly where it stopped.
   import { appState } from '../../lib/store/app-state.svelte.js';
   import { copy } from '../../lib/i18n-copy/es.js';
   import RitualSteps from './RitualSteps.svelte';
 
-  const resumed = $derived(appState.week.ritualStep > 1);
+  const resumed = $derived(
+    appState.week.ritualStep > 1 && appState.week.ritualStep < 4,
+  );
 </script>
 
 <div class="week-view">
