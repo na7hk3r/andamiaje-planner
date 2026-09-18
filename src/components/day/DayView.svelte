@@ -194,6 +194,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md, 1rem);
+    width: 100%;
+    min-width: 0;
   }
 
   .ritual {
@@ -208,6 +210,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm, 0.5rem);
+    min-width: 0;
   }
 
   .section-head .material-symbols-outlined {
@@ -219,6 +222,8 @@
     display: flex;
     flex-direction: column;
     gap: 0;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   h3 {
@@ -240,32 +245,36 @@
 
   .anchor-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-md, 1rem);
+    width: 100%;
+    min-width: 0;
   }
 
   @media (min-width: 40rem) {
     .anchor-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 64rem) {
     .anchor-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
   .block-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-md, 1rem);
-    align-items: start;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
   }
 
   @media (min-width: 48rem) {
     .block-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

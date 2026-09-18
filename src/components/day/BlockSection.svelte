@@ -121,6 +121,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md, 1rem);
+    width: 100%;
+    min-width: 0;
+    height: 100%;
     padding: var(--space-lg, 1.5rem) var(--space-md, 1rem);
     border-radius: var(--radius-card, 16px);
     background: var(--card-bg, #ffffff);
@@ -133,6 +136,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-sm, 0.5rem);
+    min-width: 0;
     border-bottom: 1px solid var(--surface-container, #f0f4f8);
     padding-bottom: var(--space-sm, 0.5rem);
   }
@@ -157,6 +161,7 @@
 
   .time {
     width: 5.2rem;
+    min-width: 0;
     padding: 0;
     border: none;
     background: transparent;
@@ -235,6 +240,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-sm, 0.5rem);
+    min-width: 0;
   }
 
   .empty {
@@ -266,11 +272,17 @@
 
   .add-row {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-sm, 0.5rem);
+    min-width: 0;
   }
 
   .add-row input {
-    flex: 1;
+    flex: 1 1 8rem;
     min-width: 0;
+  }
+
+  .add-row button {
+    flex: 0 0 auto;
   }
 </style>

@@ -64,6 +64,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md, 1rem);
+    width: 100%;
+    min-width: 0;
     padding: var(--space-md, 1rem);
     border-radius: var(--radius-card, 16px);
     background: var(--card-bg, #ffffff);

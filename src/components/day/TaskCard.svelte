@@ -54,6 +54,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm, 0.5rem);
+    min-width: 0;
     padding: 0.35rem 0.5rem 0.35rem 0.25rem;
     border-radius: var(--radius-field, 12px);
     background: var(--bg, #fafafa);
