@@ -60,3 +60,8 @@ src/
 ## Privacidad local-first
 
 Todos los datos viven exclusivamente en el `localStorage` de este navegador, con guardado versionado y con retardo. No hay cuentas, nube ni rastreo. Es posible exportar una copia en JSON o borrar todos los datos desde Ajustes. La aplicación no sustituye la evaluación de un profesional de la salud.
+
+
+<a href="https://github.com/Gentleman-Programming/gentle-ai">
+  <img width="220" src="https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/docs/assets/brand/built-with-gentle-ai.png" alt="Built with Gentle-AI" />
+</a>
