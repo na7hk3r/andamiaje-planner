@@ -1,44 +1,50 @@
-# Andamiaje
+# Biblioteca de investigación — TDAH en adultos y Sistema de Andamiaje
 
-![Banner Andamiaje](banner-readme.png)
+Biblioteca personal, fundamentada en evidencia, sobre el TDAH/ADHD en adultos y un sistema de rutinas sostenibles diseñado a partir de esa evidencia. Todo el contenido está redactado en español neutro, con tablas, listas y secciones cortas para facilitar la lectura y el escaneo.
 
-![version](https://img.shields.io/badge/version-0.1.0-334155?style=flat-square) ![svelte](https://img.shields.io/badge/svelte-5-475569?style=flat-square) ![vite](https://img.shields.io/badge/vite-6-64748b?style=flat-square) ![vitest](https://img.shields.io/badge/vitest-3-64748b?style=flat-square) ![local-first](https://img.shields.io/badge/local--first-privacidad-475569?style=flat-square) ![español](https://img.shields.io/badge/idioma-espa%C3%B1ol_neutro-334155?style=flat-square)
+> ⚠️ **Nota importante:** esta biblioteca es material informativo y educativo. **Nada de esto sustituye una evaluación, diagnóstico o tratamiento profesional** por psiquiatría, psicología clínica u otro profesional de la salud habilitado. Si sospechas que podrías tener TDAH, consulta con un profesional.
 
-Un andamio amable para tu atención y tu día. Organiza tu día con anclas, bloques y un primer paso claro.
+---
 
-## Qué es
+## Contenido de la biblioteca
 
-Andamiaje es un planificador de rutinas diarias local-first, pensado para acompañar la atención sin exigencias ni culpa. Está dirigido a personas que buscan estructura suave: puntos de apoyo a lo largo del día, una sola tarea a la vez y un cierre tranquilo.
+| Carpeta / archivo | Qué contiene |
+|---|---|
+| `00-resumen-ejecutivo.md` | Resumen de una página: qué es el TDAH, función ejecutiva, evidencia y el sistema en 5 líneas. |
+| `01-fundamentos/` | Qué es el TDAH (criterios, presentaciones, prevalencia, comorbilidad, adultos), función ejecutiva, motivación–tiempo–arousal. |
+| `02-evidencia/` | Tratamiento farmacológico y no farmacológico, sueño/circadiano y ejercicio, estrategias prácticas con evidencia. |
+| `03-sistema/` | El **Sistema de Andamiaje**: principios de diseño, rutinas, autoevaluación y personalización. |
+| `04-fuentes.md` | Bibliografía completa con autor, año, título, medio/journal y URL. |
 
+---
 
-## Funciones principales
+## Cómo usar el sistema en 5 pasos
 
-- **Vista Día:** 4 anclas independientes (Despertar, Primera tarea, Movimiento, Apagado), 3 bloques amplios (Mañana, Mediodía, Tarde) y lista de tareas por bloque.
-- **Vista Enfoque:** primer paso de menos de dos minutos, temporizador con tramos de 20, 30 y 45 minutos más duración personalizada, pausa y reanudación, y mensaje de recompensa sin exigencias.
-- **Vista Semana:** ritual semanal en 4 pasos (Revisar, Elegir, Programar, Preparar) con un máximo de 3 prioridades y distribución sugerida sin horas rígidas.
-- **Captura rápida:** modal global con atajo Ctrl+K (o Cmd+K) para vaciar la mente y asignar la nota a un bloque.
-- **Ajustes tranquilos:** horarios de anclas y bloques, orden de bloques, duración de enfoque por defecto, exportación e importación de respaldo en JSON y borrado de datos locales.
-- **Puerta de bienvenida:** aviso de salud explícito en el primer uso y recordatorio permanente en el pie de página.
+1. **Lee el resumen ejecutivo** (`00-resumen-ejecutivo.md`): 5 minutos, te da el mapa completo.
+2. **Entiende tu base** (`01-fundamentos/`): lee al menos `01-que-es-el-tdah.md` y `02-funcion-ejecutiva.md` para saber *por qué* el sistema funciona como funciona.
+3. **Revisa la evidencia** (`02-evidencia/`): consulta qué funciona y con qué fuerza antes de elegir tus herramientas.
+4. **Personaliza** (`03-sistema/03-autoevaluacion-y-personalizacion.md`): haz la autoevaluación de 10 preguntas y ajusta el sistema a tu perfil dominante.
+5. **Implementa el Sistema de Andamiaje** (`03-sistema/02-sistema-de-rutinas.md`): empieza por las 4 anclas diarias; aplica la regla de los 3 bloques; usa el protocolo de recuperación cuando (no *si*) falles una rutina.
 
-## Diseño
+---
 
-Tipografía Outfit para titulares e Inter para el cuerpo, ambas autohospedadas como fuentes variables sin red externa. Iconografía con Material Symbols Outlined. Paleta clara y calmada con superficies suaves, acento azul pizarra y señales cálidas no punitivas. Tono de voz neutro y amable en español, sin contadores, rachas ni lenguaje clínico.
+## Orden de lectura recomendado
 
-## Inicio rápido
+**Camino completo (recomendado):**
 
-```bash
-npm install
-npm run dev
+```
+00 → 01/01 → 01/02 → 01/03 → 02/01 → 02/02 → 02/03 → 03/01 → 03/02 → 03/03
 ```
 
-```bash
-npm run build
-npm test
+**Camino rápido (solo sistema):**
+
+```
+00 → 03/01 → 03/02 → 03/03
 ```
 
-La aplicación se abre en el navegador en la dirección que indique Vite. `npm test` ejecuta la suite de Vitest (lógica pura en entorno Node).
+---
 
-## Estructura del proyecto
+## Convivencia con la información
 
 ```text
 src/
